@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('jsonwebtoken');
 
-const keys = require('../config/keys');
-
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -30,9 +28,9 @@ userSchema.methods.validPassword = function (password) {
 };
 
 // Generate JWT
-userSchema.methods.generateAuthToken = function() {
-    this.token = jwt.sign({ _id: this._id, userType: this.userType }, keys.jwtPrivateKey);
-    return this.token;
-};
+// userSchema.methods.generateAuthToken = function() {
+//     this.token = jwt.sign({ _id: this._id, userType: this.userType }, keys.jwtPrivateKey);
+//     return this.token;
+// };
 
 module.exports = mongoose.model('users', userSchema);
