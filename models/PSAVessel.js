@@ -18,6 +18,7 @@ const schema = new Schema({
     wharfMark: {type: String, default: ""},
     crane: {type: String, default: ""},
     vesselName: {type: String, default: ""},
+    vesselAbbreviation: {type: String, default: ""},
     vesselCompany: {type: String, default: ""},
     vesselIMO: {type: String, default: ""},
     vesselCallSign: {type: String, default: ""},
