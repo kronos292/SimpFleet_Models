@@ -27,4 +27,4 @@ const schema = new Schema({
     timestamp: {type: Date, default: new Date()}
 });
 
-module.exports = mongoose.model('psaVessels', schema);
+module.exports = mongoose.model('psaVessels2', schema);
