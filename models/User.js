@@ -14,7 +14,9 @@ const userSchema = new Schema({
     userType: {type: String, default: ""},
     isApproved: {type: Boolean, default: false},
     token: {type: String, default: ""},
-    registerDate: {type: String, default: ''}
+    registerDate: {type: String, default: ''},
+    resetPasswordToken: {type: String, default: ""},
+    resetPasswordExpiry: {type: String, default: ""}
 });
 
 // generating a hash
