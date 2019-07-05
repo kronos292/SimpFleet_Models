@@ -9,4 +9,4 @@ const schema = new Schema({
     job: {type: Schema.Types.ObjectId, ref: 'jobs'}
 });
 
-module.exports = mongoose.model('psaVesselTrackers', schema);
+module.exports = mongoose.model('vesselTrackers', schema);
