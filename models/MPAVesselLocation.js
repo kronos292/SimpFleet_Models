@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const schema = new Schema({
-    vessel: {type: Schema.Types.ObjectId, ref: 'mpaVessels'},
     latitude: {type: String, default: ""},
     longitude: {type: String, default: ""},
     latitudeDegrees: {type: String, default: ""},

@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const schema = new Schema({
-    psaVessel: {type: Schema.Types.ObjectId, ref: 'psaVessels'},
-    mpaVessel: {type: Schema.Types.ObjectId, ref: 'mpaVessels'},
+    vessel: {type: Schema.Types.ObjectId, ref: 'vessels'},
     isEmail: {type: Boolean, default: false},
     isSMS: {type: Boolean, default: false},
     isMobile: {type: Boolean, default: false},
