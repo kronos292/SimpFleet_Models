@@ -18,7 +18,8 @@ const jobSchema = new Schema({
     psaBerthingDateTime: {type: String, default: ''},
     psaUnberthingDateTime: {type: String, default: ''},
     googleCalendarId: {type: String, default: ''},
-    isCancelled: {type: Boolean, default: false}
+    isCancelled: {type: Boolean, default: false},
+    isArchived: {type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
