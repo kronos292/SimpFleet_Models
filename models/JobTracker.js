@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const jobTrackerSchema = new Schema({
     index: {type: Number, default: -1},
-    timestamp: {type: String, default: ''},
+    timestamp: {type: Date, default: new Date()},
     trackingType: {type: String, default: ''},
     title: {type: String, default: ''},
     description: {type: String, default: ''},

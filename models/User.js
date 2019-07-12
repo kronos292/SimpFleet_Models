@@ -14,7 +14,7 @@ const userSchema = new Schema({
     userType: {type: String, default: ""},
     isApproved: {type: Boolean, default: false},
     token: {type: String, default: ""},
-    registerDate: {type: String, default: ''},
+    registerDate: {type: Date, default: new Date()},
     resetPasswordToken: {type: String, default: ""},
     resetPasswordExpiry: {type: String, default: ""}
 });
