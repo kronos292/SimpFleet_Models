@@ -19,7 +19,8 @@ const jobSchema = new Schema({
     psaUnberthingDateTime: {type: Date, default: null},
     googleCalendarId: {type: String, default: ''},
     isCancelled: {type: Boolean, default: false},
-    isArchived: {type: Boolean, default: false}
+    isArchived: {type: Boolean, default: false},
+    produceDSA: {type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
