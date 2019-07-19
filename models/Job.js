@@ -20,7 +20,10 @@ const jobSchema = new Schema({
     googleCalendarId: {type: String, default: ''},
     isCancelled: {type: Boolean, default: false},
     isArchived: {type: Boolean, default: false},
-    createDSA: {type: Boolean, default: false}
+    createDSA: {type: Boolean, default: false},
+    vesselLighterName: {type: String, default: ''},
+    vesselLighterDateTime: {type: String, default: ''},
+    vesselLighterLocation: {type: String, default: ''}
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
