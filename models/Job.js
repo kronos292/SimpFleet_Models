@@ -22,7 +22,7 @@ const jobSchema = new Schema({
     isArchived: {type: Boolean, default: false},
     createDSA: {type: Boolean, default: false},
     vesselLighterName: {type: String, default: ''},
-    vesselLighterDateTime: {type: String, default: ''},
+    vesselLighterDateTime: {type: Date, default: null},
     vesselLighterLocation: {type: String, default: ''}
 });
 
