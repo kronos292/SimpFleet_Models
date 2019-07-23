@@ -19,7 +19,7 @@ const jobSchema = new Schema({
     psaUnberthingDateTime: {type: Date, default: null},
     googleCalendarId: {type: String, default: ''},
     isCancelled: {type: String, default: ''},
-    isArchived: {type: Boolean, default: false},
+    isArchived: {type: String, default: 'Nil'},
     createDSA: {type: Boolean, default: false},
     vesselLighterName: {type: String, default: ''},
     vesselLighterDateTime: {type: Date, default: null},
