@@ -23,7 +23,8 @@ const jobSchema = new Schema({
     createDSA: {type: Boolean, default: false},
     vesselLighterName: {type: String, default: ''},
     vesselLighterDateTime: {type: Date, default: null},
-    vesselLighterLocation: {type: String, default: ''}
+    vesselLighterLocation: {type: String, default: ''},
+    driverJobs: [{type: Schema.Types.ObjectId, ref: 'driverJobs'}]
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
