@@ -22,7 +22,7 @@ const jobSchema = new Schema({
     isArchived: {type: Boolean, default: false},
     createDSA: {type: Boolean, default: false},
     vesselLighterName: {type: String, default: ''},
-    driverJobs: [{type: Schema.Types.ObjectId, ref: 'driverJobs'}]
+    jobTrip: {type: Schema.Types.ObjectId, ref: 'jobTrips'}
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
