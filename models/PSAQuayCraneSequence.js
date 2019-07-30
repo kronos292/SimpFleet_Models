@@ -5,8 +5,7 @@ const schema = new Schema({
     berthingSequence: {type: Number, default: 1},
     psaVoyage: {type: String, default: ''},
     seqTimeFrom: {type: Date, default: null},
-    seqTimeTo: {type: Date, default: null},
-    psaVessel: {type: Schema.Types.ObjectId, ref: 'psaVessels'}
+    seqTimeTo: {type: Date, default: null}
 });
 
 module.exports = mongoose.model('psaQuayCraneSequences', schema);
