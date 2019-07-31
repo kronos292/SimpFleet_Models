@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const paymentStatusSchema = new Schema({
+const paymentTrackerSchema = new Schema({
     index: {type: Number, default: -1},
     timestamp: {type: Date, default: new Date()},
     label: {type: String, default: ''},
@@ -9,4 +9,4 @@ const paymentStatusSchema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'users'},
 });
 
-module.exports = mongoose.model('paymentStatus', paymentStatusSchema);
+module.exports = mongoose.model('paymentTrackers', paymentTrackerSchema);
