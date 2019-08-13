@@ -27,7 +27,9 @@ const jobSchema = new Schema({
     vesselLighterRemarks: {type: String, default: ''},
     jobTrip: {type: Schema.Types.ObjectId, ref: 'jobTrips'},
     psaQuayCraneSequences: [{type: Schema.Types.ObjectId, ref: 'psaQuayCraneSequences'}],
-    jobTrackerRemarks: {type: String, default: ''}
+    jobTrackerRemarks: {type: String, default: ''},
+    psaVoyageNumberIn: {type: String, default: ""},
+    psaVoyageNumberOut: {type: String, default: ""}
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
