@@ -35,4 +35,4 @@ schema.methods.validPassword = function (password) {
 //     return this.token;
 // };
 
-module.exports = mongoose.model('users', schema);
+module.exports = mongoose.model('logisticsUsers', schema);
