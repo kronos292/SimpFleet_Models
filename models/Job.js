@@ -29,7 +29,8 @@ const jobSchema = new Schema({
     psaQuayCraneSequences: [{type: Schema.Types.ObjectId, ref: 'psaQuayCraneSequences'}],
     jobTrackerRemarks: {type: String, default: ''},
     psaVoyageNumberIn: {type: String, default: ""},
-    psaVoyageNumberOut: {type: String, default: ""}
+    psaVoyageNumberOut: {type: String, default: ""},
+    psaBerf: {type: String, default: ""},
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
