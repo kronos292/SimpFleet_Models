@@ -7,7 +7,8 @@ const schema = new Schema({
     ETB: {type: Date, default: null},
     ETU: {type: Date, default: null},
     seqTimeFrom: {type: Date, default: null},
-    seqTimeTo: {type: Date, default: null}
+    seqTimeTo: {type: Date, default: null},
+    timestamp: {type: Date, default: new Date()}
 });
 
 module.exports = mongoose.model('psaQuayCraneSequences', schema);
