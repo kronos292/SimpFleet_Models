@@ -16,7 +16,8 @@ const schema = new Schema({
     token: {type: String, default: ""},
     registerDate: {type: Date, default: new Date()},
     resetPasswordToken: {type: String, default: ""},
-    resetPasswordExpiry: {type: String, default: ""}
+    resetPasswordExpiry: {type: String, default: ""},
+    pickupLocation: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}]
 });
 
 // generating a hash
