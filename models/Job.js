@@ -22,6 +22,8 @@ const jobSchema = new Schema({
     isCancelled: {type: String, default: 'Nil'},
     isArchived: {type: Boolean, default: false},
     createDSA: {type: Boolean, default: false},
+    pickup: {type: Boolean, default: false},
+    pickupLocation: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}],
     vesselLighterName: {type: String, default: ''},
     vesselLighterLocation: {type: String, default: ''},
     vesselLighterRemarks: {type: String, default: ''},
