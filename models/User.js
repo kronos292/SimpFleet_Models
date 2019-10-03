@@ -17,7 +17,7 @@ const schema = new Schema({
     registerDate: {type: Date, default: new Date()},
     resetPasswordToken: {type: String, default: ""},
     resetPasswordExpiry: {type: String, default: ""},
-    pickupLocation: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}],
+    pickupLocations: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}],
     userCompany: {type: Schema.Types.ObjectId, ref: 'userCompanies'}
 });
 
