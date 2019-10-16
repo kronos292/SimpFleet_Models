@@ -1,3 +1,6 @@
+const DeliveryPricingTimeRange = require('../models/DeliveryPricingTimeRange');
+const JobDeliveryItemPricing = require('../models/JobDeliveryItemPricing');
+
 module.exports = {
     calculateDeliveryPricing: async(jobItems) => {
         let total = 0;
