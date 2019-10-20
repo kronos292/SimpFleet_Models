@@ -6,7 +6,8 @@ const schema = new Schema({
     lighterNumber: {type: String, default: ''},
     crane: {type: String, default: ''},
     arrivalDateTime: {type: Date, default: null},
-    departureDateTime: {type: Date, default: null}
+    departureDateTime: {type: Date, default: null},
+    terminal: {type: String, default: ''}
 });
 
 module.exports = mongoose.model('jpLighterBerthCalls', schema);
