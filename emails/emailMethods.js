@@ -129,9 +129,11 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        for (let i = 0; i < job.pickupLocations.length; i++) {
-            const pickupLocation = job.pickupLocations[i];
-            pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupLocations) {
+            for (let i = 0; i < job.pickupLocations.length; i++) {
+                const pickupLocation = job.pickupLocations[i];
+                pickupLocationsStringArray.push(pickupLocation.addressString);
+            }
         }
 
 
@@ -184,9 +186,11 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        for (let i = 0; i < job.pickupLocations.length; i++) {
-            const pickupLocation = job.pickupLocations[i];
-            pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupLocations) {
+            for (let i = 0; i < job.pickupLocations.length; i++) {
+                const pickupLocation = job.pickupLocations[i];
+                pickupLocationsStringArray.push(pickupLocation.addressString);
+            }
         }
 
 
@@ -286,9 +290,11 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        for (let i = 0; i < job.pickupLocations.length; i++) {
-            const pickupLocation = job.pickupLocations[i];
-            pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupLocations) {
+            for (let i = 0; i < job.pickupLocations.length; i++) {
+                const pickupLocation = job.pickupLocations[i];
+                pickupLocationsStringArray.push(pickupLocation.addressString);
+            }
         }
 
 
@@ -480,9 +486,11 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        for (let i = 0; i < job.pickupLocations.length; i++) {
-            const pickupLocation = job.pickupLocations[i];
-            pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupLocations) {
+            for (let i = 0; i < job.pickupLocations.length; i++) {
+                const pickupLocation = job.pickupLocations[i];
+                pickupLocationsStringArray.push(pickupLocation.addressString);
+            }
         }
 
 
@@ -593,9 +601,11 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        for (let i = 0; i < job.pickupLocations.length; i++) {
-            const pickupLocation = job.pickupLocations[i];
-            pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupLocations) {
+            for (let i = 0; i < job.pickupLocations.length; i++) {
+                const pickupLocation = job.pickupLocations[i];
+                pickupLocationsStringArray.push(pickupLocation.addressString);
+            }
         }
 
 
