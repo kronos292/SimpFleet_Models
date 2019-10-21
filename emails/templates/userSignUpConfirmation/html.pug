@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+head
+  title User Sign Up Confirmation
+body
+  .WordSection1
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Dear
+        != ` ${user.firstName},`
+        o:p
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Thank you for signing up an account with us. Your account is currently pending approval and we will get back to you within 3 working days. If however, you have something that is time sensitive and wish to reach us, please email us at service@simpfleet.com.
+        o:p
+    include ../signature/html

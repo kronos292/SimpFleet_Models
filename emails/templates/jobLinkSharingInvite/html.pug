@@ -1,0 +1,27 @@
+doctype html
+html(lang='en')
+head
+    title Job Link Sharing Invite
+body
+    .WordSection1
+        p.MsoNormal
+            span(style='font-family:"Arial",sans-serif')
+                | Hi Sir/Ms,
+                o:p
+        p.MsoNormal
+            span(style='font-family:"Arial",sans-serif')
+                |
+                != `${job.user.firstName} ${job.user.lastName} has invited you to join the job to ${job.vessel.vesselName}.`
+                o:p
+        p.MsoNormal
+            span(style='font-family:"Arial",sans-serif')
+                | Join the job by navigating to
+            a( href=` ${jobLink.url}.`)
+                |
+                != `${jobLink.url}.`
+                o:p
+        p.MsoNormal
+            span(style='font-family:"Arial",sans-serif')
+                | Please feel free to email us at service@simpfleet.com if you have any queries.
+                o:p
+        include ../signature/html.pug

@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+head
+  title Job document upload reminder
+body
+  .WordSection1
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Dear
+        != ` ${user.firstName},`
+        o:p
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Thank you for booking a job with us. Please remember to upload your DO and other necessary documents to our platform, if you have not done so.
+        o:p
+    include ../signature/html

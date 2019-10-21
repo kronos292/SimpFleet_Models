@@ -1,0 +1,14 @@
+doctype html
+html(lang='en')
+head
+  title Job booking received
+body
+  .WordSection1
+    include ../salutation/html
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Please see below for details of new job:
+        o:p
+    include ../jobDetails/html
+    include ../signature/html

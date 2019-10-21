@@ -1,0 +1,26 @@
+doctype html
+html(lang='en')
+head
+  title User Job Booking Approval
+body
+  .WordSection1
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Dear
+        != ` ${user.firstName},`
+        o:p
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | We have verified and approved your job booking.
+        o:p
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | For your reference, here are the details of your job booking:
+        o:p
+    include ../jobDetails/html.pug
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Please feel free to email us at service@simpfleet.com if you have any queries.
+        o:p
+    include ../signature/html.pug

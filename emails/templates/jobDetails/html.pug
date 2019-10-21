@@ -1,0 +1,122 @@
+.WordSection1
+    p.MsoNormal(style='margin-bottom: -15px')
+        b
+            span(style='font-family:"Arial",sans-serif')
+                | Job Number:
+                != ` ${job.jobId}`
+                o:p
+    if job.vessel !== null && job.vessel.vesselIMOID !== ""
+        p.MsoNormal(style='margin-bottom: -15px')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel IMO:
+                    != ` ${job.vessel.vesselIMOID}`
+                    o:p
+    if job.vessel !== null && job.vessel.vesselName !== ""
+        p.MsoNormal(style='margin-bottom: -15px')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Name:
+                    != ` ${job.vessel.vesselName}`
+                    o:p
+    if job.vessel !== null && job.vessel.vesselCallsign !== ""
+        p.MsoNormal(style='margin-bottom: -15px')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Callsign:
+                    != ` ${job.vessel.vesselCallsign}`
+                    o:p
+    if itemString !== ""
+        p.MsoNorma(style='margin-bottom: -15px' l='')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Items to Deliver:
+                    != ` ${itemString}`
+                    o:p
+    if jobOfflandItemString !== ""
+        p.MsoNorma(style='margin-bottom: -15px' l='')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Items to Offland:
+                    != ` ${jobOfflandItemString}`
+                    o:p
+    if job.vesselLoadingLocation !== 'Jurong Port'
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Loading Location:
+                    != ` ${job.vesselLoadingLocation} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
+                    o:p
+    if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterLocation !== ""
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Loading Location:
+                    != ` ${job.vesselLighterLocation}`
+                    o:p
+        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterName !== ""
+            p.MsoNormal
+                b
+                    span(style='font-family:"Arial",sans-serif')
+                        | Vessel Lighter Name:
+                        != ` ${job.vesselLighterName}`
+                        o:p
+        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterRemarks !== ""
+            p.MsoNormal
+                b
+                    span(style='font-family:"Arial",sans-serif')
+                        | Vessel Lighter Remarks:
+                        != ` ${job.vesselLighterRemarks}`
+                        o:p
+    if job.vesselLoadingLocation !== 'PSA' && job.vesselLoadingDateTime !== ""
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Loading Date & Time:
+                    != ` ${vesselLoadingDateTime}`
+                    o:p
+    if job.vesselLoadingLocation === 'PSA' && job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Estimated Berthing Time:
+                    != ` ${psaBerthingDateTime}`
+                    o:p
+    if job.vesselLoadingLocation === 'PSA' && job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Estimated Unberthing Time:
+                    != ` ${psaUnberthingDateTime}`
+                    o:p
+    if job.pickup
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Please pick up from following locations:
+                    o:p
+    -
+    each pickupLocation in pickupLocationsStringArray
+        p.MsoNormal(style='margin-bottom: -15px')
+            span(style='font-family:"Arial",sans-serif')
+                != pickupLocation
+                o:p
+    if job.createDSA
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Please help us to create a DSA for the Job Items.
+                    o:p
+    if job.remarks !== ""
+        p.MsoNormal(style='margin-bottom: -15px')
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Remarks:
+                    o:p
+    -
+        const remarksArray = job.remarks.split("\n");
+    each remark in remarksArray
+        p.MsoNormal(style='margin-bottom: -15px')
+            span(style='font-family:"Arial",sans-serif')
+                != remark
+                o:p

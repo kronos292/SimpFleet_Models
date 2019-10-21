@@ -1,0 +1,26 @@
+doctype html
+html(lang='en')
+head
+  title Job File Upload Logistics
+body
+  .WordSection1
+    include ../salutation/html
+    br
+    if !needPrintCopy
+      p.MsoNormal
+        span(style='font-family:"Arial",sans-serif')
+          |
+          != `Please print out ${jobFile.numCopies} ${jobFile.numCopies > 1? 'copies' : 'copy'} of the attached document, to be brought along to the vessel.`
+          o:p
+    if needPrintCopy
+      p.MsoNormal
+        span(style='font-family:"Arial",sans-serif')
+          |
+          != `Please check that you receive ${jobFile.numCopies} ${jobFile.numCopies} ${jobFile.numCopies > 1? 'copies' : 'copy'} of the document in hardcopy, to be brought along to the vessel.`
+          o:p
+    if signAndReturn
+      p.MsoNormal
+        span(style='font-family:"Arial",sans-serif')
+          | Also, please ensure that the document is signed and returned to us.
+          o:p
+    include ../signature/html.pug

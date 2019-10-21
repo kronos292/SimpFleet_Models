@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+head
+  title Job booking received
+body
+  .WordSection1
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Dear Team,
+        o:p
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | New job below requires confirmation:
+        o:p
+    include ../jobDetails/html.pug
+    include ../signature/html.pug
