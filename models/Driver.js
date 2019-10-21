@@ -6,7 +6,7 @@ const schema = new Schema({
     contact: {type: String, default: ''},
     email: {type: String, default: ''},
     company: {type: String, default: ''}
-    
+
 });
 
 module.exports = mongoose.model('drivers', schema);
