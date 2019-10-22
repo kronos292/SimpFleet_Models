@@ -129,10 +129,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
@@ -186,10 +186,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
@@ -290,10 +290,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
@@ -428,10 +428,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
@@ -486,10 +486,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
@@ -601,10 +601,10 @@ module.exports = {
         }
 
         let pickupLocationsStringArray = [];
-        if(job.pickupLocations) {
-            for (let i = 0; i < job.pickupLocations.length; i++) {
-                const pickupLocation = job.pickupLocations[i];
-                pickupLocationsStringArray.push(pickupLocation.addressString);
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                pickupLocationsStringArray.push(moment(pickupDetail.pickupLocations).format('MMMM Do YYYY, h:mm:ss a') + ' - ' +pickupDetail.pickupLocation.addressString);
             }
         }
 
