@@ -96,11 +96,12 @@
                     | Please pick up from following locations:
                     o:p
     -
-    each pickupLocation in pickupLocationsStringArray
-        p.MsoNormal(style='margin-bottom: -15px')
-            span(style='font-family:"Arial",sans-serif')
-                != pickupLocation
-                o:p
+    if pickupLocationsStringArray
+        each pickupLocation in pickupLocationsStringArray
+            p.MsoNormal(style='margin-bottom: -15px')
+                span(style='font-family:"Arial",sans-serif')
+                    != pickupLocation
+                    o:p
     if job.createDSA
         p.MsoNormal
             b
