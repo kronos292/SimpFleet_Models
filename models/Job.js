@@ -8,6 +8,7 @@ const jobSchema = new Schema({
     paymentTrackers: [{type: Schema.Types.ObjectId, ref: 'paymentTrackers'}],
     vesselLoadingLocation: {type: String, default: ''},
     vesselLoadingLocationObj: {type: Schema.Types.ObjectId, ref: 'vesselLoadingLocations'},
+    otherVesselLoadingLocation: {type: String, default: ''},
     user: {type: Schema.Types.ObjectId, ref: 'users'},
     index: {type: String, default: ''},
     jobItems: [{type: Schema.Types.ObjectId, ref: 'jobItems'}],
