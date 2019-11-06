@@ -46,12 +46,12 @@
                     | Items to Offland:
                     != ` ${jobOfflandItemString}`
                     o:p
-    if job.vesselLoadingLocation !== 'Jurong Port'
+    if job.vesselLoadingLocation.type !== 'anchorage'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.vesselLoadingLocation} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
+                    != ` ${job.vesselLoadingLocation.name} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
                     o:p
     if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterLocation !== ""
         p.MsoNormal
