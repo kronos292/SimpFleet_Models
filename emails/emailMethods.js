@@ -13,18 +13,74 @@ async function getTemplatePath(templateName) {
 }
 
 async function formulateEmailLocals(job) {
-    const items = job.jobItems;
-    let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-    for (let i = 1; i < items.length; i++) {
-        const item = items[i];
-        itemString += `, ${item.quantity} ${item.uom}`
+    let {jobItems, jobOfflandItems, careOffParties} = job;
+
+    // Add items of care-off parties
+    for (let i = 0; i < careOffParties.length; i++) {
+        const careOffParty = careOffParties[i];
+        jobItems = jobItems.concat(careOffParty.jobItems);
+        jobOfflandItems = jobOfflandItems.concat(careOffParty.jobOfflandItems);
     }
 
-    const jobOfflandItems = job.jobOfflandItems;
+    // Merge job items with duplicate uom
+    const mergedJobItems = [];
+    for (let i = 0; i < jobItems.length; i++) {
+        const jobItem = jobItems[i];
+        let foundMergedJobItem = null;
+        for (let j = 0; j < mergedJobItems.length; j++) {
+            const mergedJobItem = mergedJobItems[j];
+            if (mergedJobItem.uom === jobItem.uom) {
+                foundMergedJobItem = mergedJobItem;
+                break;
+            }
+        }
+        if(foundMergedJobItem !== null) {
+            foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobItem.quantity);
+        } else {
+            mergedJobItems.push(jobItem);
+        }
+    }
+    jobItems = mergedJobItems;
+
+    // Merge job offland items with duplicate uom
+    const mergedJobOfflandItems = [];
+    for (let i = 0; i < jobOfflandItems.length; i++) {
+        const jobOfflandItem = jobOfflandItems[i];
+        let foundMergedJobItem = null;
+        for (let j = 0; j < mergedJobOfflandItems.length; j++) {
+            const mergedJobItem = mergedJobOfflandItems[j];
+            if (mergedJobItem.uom === jobOfflandItem.uom) {
+                foundMergedJobItem = mergedJobItem;
+                break;
+            }
+        }
+        if(foundMergedJobItem !== null) {
+            foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobOfflandItem.quantity);
+        } else {
+            mergedJobOfflandItems.push(jobOfflandItem);
+        }
+    }
+    jobOfflandItems = mergedJobOfflandItems;
+
+    let itemString = jobItems.length > 0 ? `${jobItems[0].quantity} ${jobItems[0].uom}` : '';
+    for (let i = 1; i < jobItems.length; i++) {
+        const jobItem = jobItems[i];
+        itemString += `, ${jobItem.quantity} ${jobItem.uom}`
+    }
+
     let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
     for (let i = 1; i < jobOfflandItems.length; i++) {
         const jobOfflandItem = jobOfflandItems[i];
         jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
+    }
+
+    let pickupLocationsStringArray = [];
+    if(job.pickupDetails) {
+        for (let i = 0; i < job.pickupDetails.length; i++) {
+            const pickupDetail = job.pickupDetails[i];
+            const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+            pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+        }
     }
 
     return(
@@ -33,6 +89,7 @@ async function formulateEmailLocals(job) {
             job,
             itemString,
             jobOfflandItemString,
+            pickupLocationsStringArray,
             vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
             psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
             psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): ""
@@ -40,7 +97,7 @@ async function formulateEmailLocals(job) {
     );
 }
 
-async function sendEmail(emailTo, templateName, emailSubject, ccList, locals) {
+async function sendEmail(emailTo, templateName, emailSubject, ccList, locals, attachments) {
     const email = new Email({
         message: {
             from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
@@ -60,7 +117,8 @@ async function sendEmail(emailTo, templateName, emailSubject, ccList, locals) {
         message: {
             to: emailTo,
             subject: emailSubject,
-            cc: ccList
+            cc: ccList,
+            attachments
         },
         locals
     }).then(`${templateName} email sent.`).catch(console.error);
@@ -104,464 +162,76 @@ module.exports = {
     sendJobBookingAdminConfirmationEmail: async (job) => {
         const locals = await formulateEmailLocals(job);
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
-        const subject = `Confirmation Needed: Job booking for ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`;
+        const subject = `${job.index} - Confirmation Needed: Job booking for ${job.vessel.vesselName}`;
+        const attachments = [];
 
-        await sendEmail(keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL, 'jobBookingAdminConfirmation', subject, ccList, locals);
+        await sendEmail(keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL, 'jobBookingAdminConfirmation', subject, ccList, locals, attachments);
     },
     sendJobBookingAdminCancellationConfirmation: async(job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = await formulateEmailLocals(job);
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Cancellation Confirmed`;
+        const attachments = [];
 
-        const items = job.jobItems;
-        let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-        for (let i = 1; i < items.length; i++) {
-            const item = items[i];
-            itemString += `, ${item.quantity} ${item.uom}`
-        }
-
-        const jobOfflandItems = job.jobOfflandItems;
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-
-        email.send({
-            template: await getTemplatePath('jobBookingAdminCancellationConfirmation'),
-            message: {
-                to: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                subject: `Job Cancellation Confirmed - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL, 'jobBookingAdminCancellationConfirmation', subject, ccList, locals, attachments);
     },
     sendJobBookingLogisticsOrderEmail: async (job, jobAssignment) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = await formulateEmailLocals(job);
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - New Job Booking`;
+        const attachments = [];
 
-        const items = job.jobItems;
-        let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-        for (let i = 1; i < items.length; i++) {
-            const item = items[i];
-            itemString += `, ${item.quantity} ${item.uom}`
-        }
-
-        const jobOfflandItems = job.jobOfflandItems;
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-
-        email.send({
-            template: await getTemplatePath('jobBookingLogisticsOrder'),
-            message: {
-                to: jobAssignment.logisticsCompany.correspondenceEmails,
-                subject: `Job booking for ${job.vessel !== null? `${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`: 'Non-Vessel Delivery'}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(jobAssignment.logisticsCompany.correspondenceEmails, 'jobBookingLogisticsOrder', subject, ccList, locals, attachments);
     },
     sendJobBookingLogisticsUpdateEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
-        let {jobItems, jobOfflandItems, careOffParties} = job;
-
-        // Add items of care-off parties
-        for (let i = 0; i < careOffParties.length; i++) {
-            const careOffParty = careOffParties[i];
-            jobItems = jobItems.concat(careOffParty.jobItems);
-            jobOfflandItems = jobOfflandItems.concat(careOffParty.jobOfflandItems);
-        }
-
-        // Merge job items with duplicate uom
-        const mergedJobItems = [];
-        for (let i = 0; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobItems.length; j++) {
-                const mergedJobItem = mergedJobItems[j];
-                if (mergedJobItem.uom === jobItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobItem.quantity);
-            } else {
-                mergedJobItems.push(jobItem);
-            }
-        }
-        jobItems = mergedJobItems;
-
-        // Merge job offland items with duplicate uom
-        const mergedJobOfflandItems = [];
-        for (let i = 0; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobOfflandItems.length; j++) {
-                const mergedJobItem = mergedJobOfflandItems[j];
-                if (mergedJobItem.uom === jobOfflandItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobOfflandItem.quantity);
-            } else {
-                mergedJobOfflandItems.push(jobOfflandItem);
-            }
-        }
-        jobOfflandItems = mergedJobOfflandItems;
-
-        let itemString = jobItems.length > 0 ? `${jobItems[0].quantity} ${jobItems[0].uom}` : '';
-        for (let i = 1; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            itemString += `, ${jobItem.quantity} ${jobItem.uom}`
-        }
-
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-
         // Get job assignment
         const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
             path: 'logisticsCompany',
             model: 'logisticsCompanies'
         }).select();
 
-        email.send({
-            template: await getTemplatePath('jobBookingLogisticsUpdate'),
-            message: {
-                to: jobAssignment.logisticsCompany.correspondenceEmails,
-                subject: `Job details update: ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        const locals = await formulateEmailLocals(job);
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Details Update`;
+        const attachments = [];
+
+        await sendEmail(jobAssignment.logisticsCompany.correspondenceEmails, 'jobBookingLogisticsUpdate', subject, ccList, locals, attachments);
     },
     sendUserSignUpConfirmationEmail: async (user) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = {
+            user
+        };
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `Sign Up Confirmed`;
+        const attachments = [];
 
-        email.send({
-            template: await getTemplatePath('userSignUpConfirmation'),
-            message: {
-                to: user.email,
-                subject: `Sign Up Confirmed`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user,
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(user.email, 'userSignUpConfirmation', subject, ccList, locals, attachments);
     },
     sendUserJobConfirmationEmail: async (job) => {
         const locals = await formulateEmailLocals(job);
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
-        const subject = `Job Booking Confirmed - ${job.jobId}`;
+        const subject = `${job.index} - Job Booking Confirmed`;
+        const attachments = [];
 
-        await sendEmail(job.user.email, 'userJobBookingConfirmation', subject, ccList, locals);
+        await sendEmail(job.user.email, 'userJobBookingConfirmation', subject, ccList, locals, attachments);
     },
     sendUserJobApprovalEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = await formulateEmailLocals(job);
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Booking Approved`;
+        const attachments = [];
 
-        const items = job.jobItems;
-        let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-        for (let i = 1; i < items.length; i++) {
-            const item = items[i];
-            itemString += `, ${item.quantity} ${item.uom}`
-        }
-
-        const jobOfflandItems = job.jobOfflandItems;
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-
-        email.send({
-            template: await getTemplatePath('userJobBookingApproval'),
-            message: {
-                to: job.user.email,
-                subject: `Job Booking Approved - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== "" ? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(job.user.email, 'userJobBookingApproval', subject, ccList, locals, attachments);
     },
     sendUserJobCancellationConfirmation: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = await formulateEmailLocals(job);
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Cancellation Confirmed`;
+        const attachments = [];
 
-        const items = job.jobItems;
-        let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-        for (let i = 1; i < items.length; i++) {
-            const item = items[i];
-            itemString += `, ${item.quantity} ${item.uom}`
-        }
-
-        const jobOfflandItems = job.jobOfflandItems;
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-
-        email.send({
-            template: await getTemplatePath('userJobBookingCancellationConfirmation'),
-            message: {
-                to: job.user.email,
-                subject: `Job Cancellation Confirmed - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : ""
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(job.user.email, 'userJobBookingCancellationConfirmation', subject, ccList, locals, attachments);
     },
     sendUserJobStatusUpdateEmail: async (job, index) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
-        let {jobItems, jobOfflandItems, careOffParties} = job;
-
-        // Add items of care-off parties
-        for (let i = 0; i < careOffParties.length; i++) {
-            const careOffParty = careOffParties[i];
-            jobItems = jobItems.concat(careOffParty.jobItems);
-            jobOfflandItems = jobOfflandItems.concat(careOffParty.jobOfflandItems);
-        }
-
-        // Merge job items with duplicate uom
-        const mergedJobItems = [];
-        for (let i = 0; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobItems.length; j++) {
-                const mergedJobItem = mergedJobItems[j];
-                if (mergedJobItem.uom === jobItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobItem.quantity);
-            } else {
-                mergedJobItems.push(jobItem);
-            }
-        }
-        jobItems = mergedJobItems;
-
-        // Merge job offland items with duplicate uom
-        const mergedJobOfflandItems = [];
-        for (let i = 0; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobOfflandItems.length; j++) {
-                const mergedJobItem = mergedJobOfflandItems[j];
-                if (mergedJobItem.uom === jobOfflandItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobOfflandItem.quantity);
-            } else {
-                mergedJobOfflandItems.push(jobOfflandItem);
-            }
-        }
-        jobOfflandItems = mergedJobOfflandItems;
-
-        let itemString = jobItems.length > 0 ? `${jobItems[0].quantity} ${jobItems[0].uom}` : '';
-        for (let i = 1; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            itemString += `, ${jobItem.quantity} ${jobItem.uom}`
-        }
-
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
         let statusUpdate;
         if (index === 3) {
             statusUpdate = "Our warehouse is currently waiting for the arrival of your items.";
@@ -573,51 +243,20 @@ module.exports = {
             statusUpdate = "We have successfully delivered your items to the vessel.";
         }
 
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
+        const locals = await formulateEmailLocals(job);
+        locals.statusUpdate = statusUpdate;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Status Update`;
+        const attachments = [];
 
-
-        email.send({
-            template: await getTemplatePath('userJobStatusUpdate'),
-            message: {
-                to: job.user.email,
-                subject: `Job Status Update - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== "" ? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                statusUpdate
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(job.user.email, 'userJobStatusUpdate', subject, ccList, locals, attachments);
     },
     sendJobFileUploadLogisticsEmail: async (jobFile, job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        // Get job assignment
+        const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
+            path: 'logisticsCompany',
+            model: 'logisticsCompanies'
+        }).select();
 
         const {requirements} = jobFile;
         let signAndReturn = false;
@@ -631,164 +270,38 @@ module.exports = {
             }
         }
 
-        // Get job assignment
-        const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
-            path: 'logisticsCompany',
-            model: 'logisticsCompanies'
-        }).select();
-
-        email.send({
-            template: await getTemplatePath('jobFileUploadLogistics'),
-            message: {
-                to: jobAssignment.logisticsCompany.correspondenceEmails,
-                subject: `New document submitted for job ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL],
-                attachments: [
-                    {
-                        filename: jobFile.filename,
-                        path: jobFile.fileURL
-                    }
-                ]
-            },
-            locals: {
-                job,
-                jobFile,
-                signAndReturn,
-                needPrintCopy
+        const locals = await formulateEmailLocals(job);
+        locals.signAndReturn = signAndReturn;
+        locals.needPrintCopy = needPrintCopy;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - New Document Submitted`;
+        const attachments = [
+            {
+                filename: jobFile.filename,
+                path: jobFile.fileURL
             }
-        }).then(console.log).catch(console.error);
+        ];
+
+        await sendEmail(jobAssignment.logisticsCompany.correspondenceEmails, 'jobFileUploadLogistics', subject, ccList, locals, attachments);
     },
     sendUserEmailReminderDocUpload: async (notification) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const {job} = notification;
-        let {jobItems, jobOfflandItems, careOffParties} = job;
 
-        // Add items of care-off parties
-        for (let i = 0; i < careOffParties.length; i++) {
-            const careOffParty = careOffParties[i];
-            jobItems = jobItems.concat(careOffParty.jobItems);
-            jobOfflandItems = jobOfflandItems.concat(careOffParty.jobOfflandItems);
-        }
+        const locals = await formulateEmailLocals(job);
+        locals.user = notification.user;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Document Upload Reminder`;
+        const attachments = [];
 
-        // Merge job items with duplicate uom
-        const mergedJobItems = [];
-        for (let i = 0; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobItems.length; j++) {
-                const mergedJobItem = mergedJobItems[j];
-                if (mergedJobItem.uom === jobItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobItem.quantity);
-            } else {
-                mergedJobItems.push(jobItem);
-            }
-        }
-        jobItems = mergedJobItems;
-
-        // Merge job offland items with duplicate uom
-        const mergedJobOfflandItems = [];
-        for (let i = 0; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            let foundMergedJobItem = null;
-            for (let j = 0; j < mergedJobOfflandItems.length; j++) {
-                const mergedJobItem = mergedJobOfflandItems[j];
-                if (mergedJobItem.uom === jobOfflandItem.uom) {
-                    foundMergedJobItem = mergedJobItem;
-                    break;
-                }
-            }
-            if(foundMergedJobItem !== null) {
-                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobOfflandItem.quantity);
-            } else {
-                mergedJobOfflandItems.push(jobOfflandItem);
-            }
-        }
-        jobOfflandItems = mergedJobOfflandItems;
-
-        let itemString = jobItems.length > 0 ? `${jobItems[0].quantity} ${jobItems[0].uom}` : '';
-        for (let i = 1; i < jobItems.length; i++) {
-            const jobItem = jobItems[i];
-            itemString += `, ${jobItem.quantity} ${jobItem.uom}`
-        }
-
-        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-        for (let i = 1; i < jobOfflandItems.length; i++) {
-            const jobOfflandItem = jobOfflandItems[i];
-            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-        }
-
-        let pickupLocationsStringArray = [];
-        if(job.pickupDetails) {
-            for (let i = 0; i < job.pickupDetails.length; i++) {
-                const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
-            }
-        }
-
-        email.send({
-            template: await getTemplatePath('userJobDocUploadReminder'),
-            message: {
-                to: notification.user.email,
-                subject: `Document Upload Reminder - Job ${notification.job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: notification.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(notification.user.email, 'userJobDocUploadReminder', subject, ccList, locals, attachments);
     },
     sendJobLinkSharingInvite: async (userEmail, job, jobLink) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
+        const locals = await formulateEmailLocals(job);
+        locals.jobLink = jobLink;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const subject = `${job.index} - Job Invitation`;
+        const attachments = [];
 
-        email.send({
-            template: await getTemplatePath('jobLinkSharingInvite'),
-            message: {
-                to: userEmail,
-                subject: `Job Invite - ${job.vessel.vesselName}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                job,
-                jobLink
-            }
-        }).then(console.log).catch(console.error);
+        await sendEmail(userEmail, 'jobLinkSharingInvite', subject, ccList, locals, attachments);
     }
 };
