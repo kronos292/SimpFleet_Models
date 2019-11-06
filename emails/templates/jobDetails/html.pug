@@ -53,42 +53,42 @@
                     | Vessel Loading Location:
                     != ` ${job.vesselLoadingLocation} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
                     o:p
-    if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterLocation !== ""
+    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterLocation !== ""
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.vesselLighterLocation}`
+                    != ` ${job.vesselLoadingLocation.name}`
                     o:p
-        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterName !== ""
+        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
             p.MsoNormal
                 b
                     span(style='font-family:"Arial",sans-serif')
                         | Vessel Lighter Name:
                         != ` ${job.vesselLighterName}`
                         o:p
-        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterRemarks !== ""
+        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
             p.MsoNormal
                 b
                     span(style='font-family:"Arial",sans-serif')
                         | Vessel Lighter Remarks:
                         != ` ${job.vesselLighterRemarks}`
                         o:p
-    if job.vesselLoadingLocation !== 'PSA' && job.vesselLoadingDateTime !== ""
+    if job.vesselLoadingLocation.type === 'port' && job.vesselLoadingDateTime !== ""
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Date & Time:
                     != ` ${vesselLoadingDateTime}`
                     o:p
-    if job.vesselLoadingLocation === 'PSA' && job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null
+    if job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Estimated Berthing Time:
                     != ` ${psaBerthingDateTime}`
                     o:p
-    if job.vesselLoadingLocation === 'PSA' && job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null
+    if job.vesselLoadingLocation.type === 'port' && job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
