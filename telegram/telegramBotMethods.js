@@ -9,10 +9,21 @@ const Location = require('../models/Location');
 const PSABerth = require('../models/PSABerth');
 const LogisticsCompany = require('../models/LogisticsCompany');
 const UserCompany = require('../models/UserCompany');
+const PSAVessel = require('../models/PSAVessel');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
 });
+
+async function qcDateTimeParser(dateTimeString) {
+    const day = Number(dateTimeString.split(" ")[0].split("/")[0]);
+    const month = Number(dateTimeString.split(" ")[0].split("/")[1]);
+    const year = Number(dateTimeString.split(" ")[0].split("/")[2]);
+    const hour = Number(dateTimeString.split(" ")[1].split(":")[0]);
+    const minutes = Number(dateTimeString.split(" ")[1].split(":")[1]);
+    const seconds = Number(dateTimeString.split(" ")[1].split(":")[2]);
+    return new Date(`${year}-${month}-${day} ${hour}:${minutes}:${seconds} GMT+08:00`);
+}
 
 async function formJobMessage(job, status) {
     const heading = status === "Update" ? 'Job Update' : 'New job';
@@ -228,6 +239,83 @@ async function sendAdminJobUpdateInfo(job) {
     }
 }
 
+async function jobBerthTimingUpdate(job) {
+    const {vessel} = job;
+
+    let messageString = `Updated vessel berth info for ${job.index}: \n\n`;
+    messageString += `Job Number: ${job.jobId}\n`;
+    messageString += `Company: ${job.user.userCompany.name}\n`;
+    messageString += `Vessel: ${vessel.vesselName}\n`;
+    messageString += `Berthing Time: ${moment.tz(new Date(job.psaBerthingDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}\n`;
+    messageString += `Unberthing Time: ${moment.tz(new Date(job.psaUnberthingDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}\n`;
+    messageString += `Berf: ${job.psaBerf}\n`;
+
+    await api.sendMessage({
+        chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+        text: messageString
+    });
+}
+
+async function jobBerthQCAdminUpdate(vessels) {
+    if(vessels.length > 0) {
+        let text = 'PSA Quay Crane Sequence Update: \n\n';
+        for(let i = 0; i < vessels.length; i++) {
+            const vessel = vessels[i];
+
+            text += `${vessel['Vessel Name']}: From ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time From']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')} to ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time To']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}. \n`;
+        }
+
+        await api.sendMessage({
+            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+            text
+        });
+    }
+}
+
+async function sendLighterBerthCallArrivalInformation(jpLighterBerthCall) {
+    const {lighterName, lighterNumber, terminal, arrivalDateTime, crane, companyName} = jpLighterBerthCall;
+    if(lighterName && lighterName !== '')  {
+        let text = 'JP Lighter Arrival Update: \n\n'
+            + `Terminal: ${terminal === 'msw'? 'Marina South Wharves': 'Penjuru Terminal'}\n`
+            + `Lighter Name: ${lighterName}\n`
+            + `Lighter Number: ${lighterNumber}\n`
+            + `Company Name: ${companyName}\n`
+            + `Crane: ${crane}\n`
+            + `Arrival DateTime: ${moment.tz(new Date(arrivalDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
+
+        await api.sendMessage({
+            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+            text
+        });
+    }
+}
+
+async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
+    const {lighterName, lighterNumber, terminal, arrivalDateTime, departureDateTime, crane, companyName} = jpLighterBerthCall;
+    if(lighterName && lighterName !== '')  {
+        let text = 'JP Lighter Departure Update: \n\n'
+            + `Terminal: ${terminal === 'msw'? 'Marina South Wharves': 'Penjuru Terminal'}\n`
+            + `Lighter Name: ${lighterName}\n`
+            + `Lighter Number: ${lighterNumber}\n`
+            + `Company Name: ${companyName}\n`
+            + `Crane: ${crane}\n`
+            + `Arrival DateTime: ${moment.tz(new Date(arrivalDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`
+            + `Departure DateTime: ${moment.tz(new Date(departureDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
+
+        await api.sendMessage({
+            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+            text
+        });
+    }
+}
+
+async function sendErrorLogs(err) {
+    await api.sendMessage({
+        chat_id: keys.SIMPFLEET_TELEGRAM_ERROR_LOG_CHAT_ID,
+        text: err.toString()
+    });
+}
+
 module.exports = {
     sendJobBookingInfo: async (job) => {
         const jobDetails = await formJobMessage(job, "Create");
@@ -264,5 +352,10 @@ module.exports = {
     documentCreationMessage,
     jobCancellationConfirmation,
     sendAdminJobBookingInfo,
-    sendAdminJobUpdateInfo
+    sendAdminJobUpdateInfo,
+    jobBerthTimingUpdate,
+    jobBerthQCAdminUpdate,
+    sendLighterBerthCallArrivalInformation,
+    sendLighterBerthCallDepartureInformation,
+    sendErrorLogs
 };
