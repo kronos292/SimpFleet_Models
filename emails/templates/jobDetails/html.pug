@@ -46,63 +46,49 @@
                     | Items to Offland:
                     != ` ${jobOfflandItemString}`
                     o:p
-    if job.vesselLoadingLocation.type === 'port'
+    if job.vesselLoadingLocation !== 'Jurong Port'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.vesselLoadingLocation.name} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
+                    != ` ${job.vesselLoadingLocation} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
                     o:p
-    if job.vesselLoadingLocation.type === 'terminal'
+    if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterLocation !== ""
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.vesselLoadingLocation.name}`
+                    != ` ${job.vesselLighterLocation}`
                     o:p
-    if job.vesselLoadingLocation.type === 'others'
-        p.MsoNormal
-            b
-                span(style='font-family:"Arial",sans-serif')
-                    | Vessel Loading Location:
-                    != ` ${job.otherVesselLoadingLocation}`
-                    o:p
-    if job.vesselLoadingLocation.type === 'anchorage'
-        p.MsoNormal
-            b
-                span(style='font-family:"Arial",sans-serif')
-                    | Vessel Loading Location:
-                    != ` ${job.vesselLighterLocation.name}`
-                    o:p
-        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
+        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterName !== ""
             p.MsoNormal
                 b
                     span(style='font-family:"Arial",sans-serif')
                         | Vessel Lighter Name:
                         != ` ${job.vesselLighterName}`
                         o:p
-        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
+        if job.vesselLoadingLocation === 'Jurong Port' && job.vesselLighterRemarks !== ""
             p.MsoNormal
                 b
                     span(style='font-family:"Arial",sans-serif')
                         | Vessel Lighter Remarks:
                         != ` ${job.vesselLighterRemarks}`
                         o:p
-    if job.vesselLoadingLocation.type !== 'port' && job.vesselLoadingDateTime !== ""
+    if job.vesselLoadingLocation !== 'PSA' && job.vesselLoadingDateTime !== ""
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Date & Time:
                     != ` ${vesselLoadingDateTime}`
                     o:p
-    if job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null
+    if job.vesselLoadingLocation === 'PSA' && job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Estimated Berthing Time:
                     != ` ${psaBerthingDateTime}`
                     o:p
-    if job.vesselLoadingLocation.type === 'port' && job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null
+    if job.vesselLoadingLocation === 'PSA' && job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
