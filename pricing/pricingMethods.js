@@ -39,15 +39,10 @@ module.exports = {
             deliveryTime = job.vesselLoadingDateTime
         }
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-        if (moment(deliveryTime, 'hh:mm:ss').isBetween(beforeTime, afterTime)) {
+        if (moment(deliveryTime, 'hh:mm:ss').isBetween(beforeTime, afterTime) && deliveryTime.isoWeekday() <= 6) {
             serial += "WH"
         } else {
-            serial += "AWH"
-        }
-        if (deliveryTime.isoWeekday() <= 6) {
-            serial += "WD"
-        } else {
-            serial += "NWD"
+            serial += "NWH"
         }
         if (quantity === 1) {
             serial += "1"
