@@ -1,6 +1,6 @@
 const DeliveryPricingTimeRange = require('../models/DeliveryPricingTimeRange');
 const JobDeliveryItemPricing = require('../models/JobDeliveryItemPricing');
-const Job = require('../models/Job');
+const JobItemPriceIndex = require('../models/JobItemPriceIndex');
 const moment = require('moment-timezone');
 
 module.exports = {
@@ -58,6 +58,7 @@ module.exports = {
         if (jobItem.uom === 'Pallet'){
             serial += 'P'
         }
-        return serial;
+        let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
+        return JobItemPriceIndex.price;
     }
 };
