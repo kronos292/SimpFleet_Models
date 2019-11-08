@@ -66,7 +66,7 @@ async function formJobMessage(job, status) {
     if (jobOfflandItemString !== "") {
         messageString += `Items to Offland: ${jobOfflandItemString}\n`;
     }
-    messageString += `Vessel Loading Location: ${job.vesselLoadingLocation}\n`;
+    messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
     if (job.vesselLoadingLocation.type === 'port') {
         if (job.psaBerf !== '') {
             messageString += `Berth: ${job.psaBerf}\n`;
@@ -88,7 +88,7 @@ async function formJobMessage(job, status) {
             messageString += `Lighter Loading Date & Time: ${vesselLoadingDateTime}\n`;
         }
     } else {
-        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation}\n`;
+        // messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.vesselLoadingDateTime !== "") {
             messageString += `Vessel Loading Date & Time: ${vesselLoadingDateTime}\n`;
         }
