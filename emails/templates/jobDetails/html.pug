@@ -72,7 +72,7 @@
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.vesselLighterLocation.name}`
+                    != ` ${job.vesselLoadingLocation.name}`
                     o:p
         if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
             p.MsoNormal
