@@ -53,35 +53,42 @@
                     | Vessel Loading Location:
                     != ` ${job.vesselLoadingLocation.name} ${job.psaBerf !== null && job.psaBerf !== '' ? `Berf ${job.psaBerf}` : ''}`
                     o:p
-    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterLocation !== ""
+    if job.vesselLoadingLocation.type === 'terminal'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
                     != ` ${job.vesselLoadingLocation.name}`
                     o:p
-    if job.vessel === null
+    if job.vesselLoadingLocation.type === 'others'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
-                    | Delivery Location:
+                    | Vessel Loading Location:
                     != ` ${job.otherVesselLoadingLocation}`
                     o:p
-    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
+    if job.vesselLoadingLocation.type === 'anchorage'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
-                    | Vessel Lighter Name:
-                    != ` ${job.vesselLighterName}`
+                    | Vessel Loading Location:
+                    != ` ${job.vesselLighterLocation.name}`
                     o:p
-    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
-        p.MsoNormal
-            b
-                span(style='font-family:"Arial",sans-serif')
-                    | Vessel Lighter Remarks:
-                    != ` ${job.vesselLighterRemarks}`
-                    o:p
-    if job.vesselLoadingLocation.type === 'port' && job.vesselLoadingDateTime !== ""
+        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
+            p.MsoNormal
+                b
+                    span(style='font-family:"Arial",sans-serif')
+                        | Vessel Lighter Name:
+                        != ` ${job.vesselLighterName}`
+                        o:p
+        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
+            p.MsoNormal
+                b
+                    span(style='font-family:"Arial",sans-serif')
+                        | Vessel Lighter Remarks:
+                        != ` ${job.vesselLighterRemarks}`
+                        o:p
+    if job.vesselLoadingLocation.type !== 'port' && job.vesselLoadingDateTime !== ""
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
