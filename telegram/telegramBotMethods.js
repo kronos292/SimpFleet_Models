@@ -106,7 +106,7 @@ async function formJobMessage(job, status) {
     if (job.pickup) {
         messageString += `Please pick up from following locations:\n`;
         for (let i = 0; i < job.pickupDetails.length; i++) {
-            const pickUpDateTime = moment.tz(new Date(job.pickupDetails[i].pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+            const pickUpDateTime = moment.tz(new Date(job.pickupDetails[i].pickupDateTime), "Asia/Singapore").format('DD MMMM YYYY, HH:mm');
             messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
         }
     }
