@@ -32,7 +32,7 @@ async function formJobMessage(job, status) {
 
     const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? moment.tz(new Date(job.vesselLoadingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? moment.tz(new Date(job.psaBerthingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
-    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !==null) ? moment.tz(new Date(job.psaUnberthingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
+    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? moment.tz(new Date(job.psaUnberthingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
 
 
     const items = job.jobItems;
@@ -54,10 +54,10 @@ async function formJobMessage(job, status) {
     let messageString = `${heading} for ${job.index}: \n\n`;
     messageString += `Job ID: ${job.index}\n`;
     messageString += `Job Number: ${job.jobId}\n`;
-    if(userCompany !== null) {
+    if (userCompany !== null) {
         messageString += `Company: ${userCompany.name}\n`;
     }
-    if(vessel !== null) {
+    if (vessel !== null) {
         messageString += `Vessel Name: ${vessel.vesselName}\n`;
         messageString += `Vessel IMO: ${vessel.vesselIMOID}\n`;
         messageString += `Vessel Callsign: ${vessel.vesselCallsign}\n`;
@@ -66,8 +66,8 @@ async function formJobMessage(job, status) {
     if (jobOfflandItemString !== "") {
         messageString += `Items to Offland: ${jobOfflandItemString}\n`;
     }
-    messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
     if (job.vesselLoadingLocation.type === 'port') {
+        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.psaBerf !== '') {
             messageString += `Berth: ${job.psaBerf}\n`;
         }
@@ -78,6 +78,7 @@ async function formJobMessage(job, status) {
             messageString += `Vessel Estimated Unberthing Time: ${psaUnberthingDateTime}\n`;
         }
     } else if (job.vesselLoadingLocation.type === 'anchorage') {
+        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.vesselLighterName !== "") {
             messageString += `Vessel Lighter Name: ${job.vesselLighterName}\n`;
         }
@@ -87,8 +88,13 @@ async function formJobMessage(job, status) {
         if (job.vesselLoadingDateTime !== "") {
             messageString += `Lighter Loading Date & Time: ${vesselLoadingDateTime}\n`;
         }
+    } else if (job.vesselLoadingLocation.type === 'others') {
+        messageString += `Vessel Loading Location: ${job.otherVesselLoadingLocation}\n`;
+        if (job.vesselLoadingDateTime !== "") {
+            messageString += `Vessel Loading Date & Time: ${vesselLoadingDateTime}\n`;
+        }
     } else {
-        // messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
+        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.vesselLoadingDateTime !== "") {
             messageString += `Vessel Loading Date & Time: ${vesselLoadingDateTime}\n`;
         }
@@ -119,17 +125,17 @@ async function documentCreationMessage(jobFile, job) {
     const {numCopies, requirements, remarks} = jobFile;
     let text = `A new document has been created for job ${job.jobId}\n\n`;
     let needPrintCopy = false;
-    for(let i = 0; i <  requirements.length; i++) {
+    for (let i = 0; i < requirements.length; i++) {
         const requirement = requirements[i];
         const {key, check} = requirement;
-        if(key === "needPrintCopy" && check) {
+        if (key === "needPrintCopy" && check) {
             needPrintCopy = true;
             text += `Please help to print ${numCopies} copies.\n`;
-        } else if(key === "signAndReturn" && check) {
+        } else if (key === "signAndReturn" && check) {
             text += `The document needs to be signed and returned.\n`;
         }
     }
-    if(remarks !== 'NIL') {
+    if (remarks !== 'NIL') {
         text += 'Remarks: ' + remarks + '\n';
     }
 
@@ -144,7 +150,7 @@ async function documentCreationMessage(jobFile, job) {
         chat_id: logisticsCompany.telegramGroupChatId,
         text
     });
-    if(needPrintCopy) {
+    if (needPrintCopy) {
         await api.sendDocument({
             chat_id: logisticsCompany.telegramGroupChatId,
             document: jobFile.fileURL,
@@ -172,18 +178,18 @@ async function jobCancellationConfirmation(job) {
 async function sendLocation(job, message) {
     // Send vessel loading location
     let location = null;
-    if(job.vesselLoadingLocation.type === 'anchorage') {
+    if (job.vesselLoadingLocation.type === 'anchorage') {
         location = await Location.findOne({name: job.vesselLighterLocation}).select();
-    } else if(job.vesselLoadingLocation.type === 'port') {
+    } else if (job.vesselLoadingLocation.type === 'port') {
         const {psaBerf} = job;
         const psaBerth = await PSABerth.findOne({berth: psaBerf}).populate({
             path: 'location',
             model: 'locations'
         }).select();
-        location = psaBerth !== null? psaBerth.location: null;
+        location = psaBerth !== null ? psaBerth.location : null;
     }
 
-    if(location !== null) {
+    if (location !== null) {
         await api.sendLocation({
             chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
             longitude: location.lng,
@@ -199,7 +205,7 @@ async function sendAdminJobBookingInfo(job) {
     try {
         const keyboardButtons = [];
         const logisticsCompanies = await LogisticsCompany.find().select();
-        for(let i = 0; i < logisticsCompanies.length; i++) {
+        for (let i = 0; i < logisticsCompanies.length; i++) {
             const logisticsCompany = logisticsCompanies[i];
             keyboardButtons.push({
                 text: logisticsCompany.name,
@@ -218,7 +224,7 @@ async function sendAdminJobBookingInfo(job) {
 
         // Send vessel loading location
         await sendLocation(job, message);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -234,7 +240,7 @@ async function sendAdminJobUpdateInfo(job) {
 
         // Send vessel loading location
         await sendLocation(job, message);
-    } catch(err) {
+    } catch (err) {
         console.log(err);
     }
 }
@@ -257,9 +263,9 @@ async function jobBerthTimingUpdate(job) {
 }
 
 async function jobBerthQCAdminUpdate(vessels) {
-    if(vessels.length > 0) {
+    if (vessels.length > 0) {
         let text = 'PSA Quay Crane Sequence Update: \n\n';
-        for(let i = 0; i < vessels.length; i++) {
+        for (let i = 0; i < vessels.length; i++) {
             const vessel = vessels[i];
 
             text += `${vessel['Vessel Name']}: From ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time From']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')} to ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time To']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}. \n`;
@@ -274,9 +280,9 @@ async function jobBerthQCAdminUpdate(vessels) {
 
 async function sendLighterBerthCallArrivalInformation(jpLighterBerthCall) {
     const {lighterName, lighterNumber, terminal, arrivalDateTime, crane, companyName} = jpLighterBerthCall;
-    if(lighterName && lighterName !== '')  {
+    if (lighterName && lighterName !== '') {
         let text = 'JP Lighter Arrival Update: \n\n'
-            + `Terminal: ${terminal === 'msw'? 'Marina South Wharves': 'Penjuru Terminal'}\n`
+            + `Terminal: ${terminal === 'msw' ? 'Marina South Wharves' : 'Penjuru Terminal'}\n`
             + `Lighter Name: ${lighterName}\n`
             + `Lighter Number: ${lighterNumber}\n`
             + `Company Name: ${companyName}\n`
@@ -292,9 +298,9 @@ async function sendLighterBerthCallArrivalInformation(jpLighterBerthCall) {
 
 async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
     const {lighterName, lighterNumber, terminal, arrivalDateTime, departureDateTime, crane, companyName} = jpLighterBerthCall;
-    if(lighterName && lighterName !== '')  {
+    if (lighterName && lighterName !== '') {
         let text = 'JP Lighter Departure Update: \n\n'
-            + `Terminal: ${terminal === 'msw'? 'Marina South Wharves': 'Penjuru Terminal'}\n`
+            + `Terminal: ${terminal === 'msw' ? 'Marina South Wharves' : 'Penjuru Terminal'}\n`
             + `Lighter Name: ${lighterName}\n`
             + `Lighter Number: ${lighterNumber}\n`
             + `Company Name: ${companyName}\n`
