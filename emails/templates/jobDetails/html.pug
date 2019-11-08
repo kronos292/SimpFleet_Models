@@ -46,7 +46,7 @@
                     | Items to Offland:
                     != ` ${jobOfflandItemString}`
                     o:p
-    if job.vesselLoadingLocation.type !== 'anchorage'
+    if job.vesselLoadingLocation.type === 'port'
         p.MsoNormal
             b
                 span(style='font-family:"Arial",sans-serif')
@@ -60,20 +60,27 @@
                     | Vessel Loading Location:
                     != ` ${job.vesselLoadingLocation.name}`
                     o:p
-        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
-            p.MsoNormal
-                b
-                    span(style='font-family:"Arial",sans-serif')
-                        | Vessel Lighter Name:
-                        != ` ${job.vesselLighterName}`
-                        o:p
-        if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
-            p.MsoNormal
-                b
-                    span(style='font-family:"Arial",sans-serif')
-                        | Vessel Lighter Remarks:
-                        != ` ${job.vesselLighterRemarks}`
-                        o:p
+    if job.vessel === null
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Delivery Location:
+                    != ` ${job.otherVesselLoadingLocation}`
+                    o:p
+    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterName !== ""
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Lighter Name:
+                    != ` ${job.vesselLighterName}`
+                    o:p
+    if job.vesselLoadingLocation.type === 'anchorage' && job.vesselLighterRemarks !== ""
+        p.MsoNormal
+            b
+                span(style='font-family:"Arial",sans-serif')
+                    | Vessel Lighter Remarks:
+                    != ` ${job.vesselLighterRemarks}`
+                    o:p
     if job.vesselLoadingLocation.type === 'port' && job.vesselLoadingDateTime !== ""
         p.MsoNormal
             b
