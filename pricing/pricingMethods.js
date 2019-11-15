@@ -26,7 +26,7 @@ module.exports = {
         return total;
     },
 
-    indexJobItemPricing: async (jobItem, job,type) => {
+    indexJobItemPricing: async (jobItem, job, type) => {
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
@@ -61,11 +61,11 @@ module.exports = {
                 serial += "6P"
             }
         }
-        let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
-        if (!JobItemPriceIndex){
+        let jobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
+        if (!jobItemPriceIndex){
             return 0;
         }
-        return JobItemPriceIndex.price;
+        return jobItemPriceIndex.price;
     },
     getOfflandingPrice: async (uom) => {
         let serial = 'O';

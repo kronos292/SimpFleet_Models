@@ -6,4 +6,4 @@ const schema = new Schema({
     price: {type: Number, default: 0},
 });
 
-module.exports = mongoose.model('jobItemPricingIndexes', schema);
+module.exports = mongoose.model('jobItemPriceIndexes', schema);
