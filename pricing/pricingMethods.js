@@ -26,10 +26,7 @@ module.exports = {
         return total;
     },
 
-    indexJobItemPricing: async (jobItem, type) => {
-        const job = await Job.findOne({_id:jobItem.job}).select();
-        console.log(jobItem)
-        console.log(job)
+    indexJobItemPricing: async (jobItem, job,type) => {
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
