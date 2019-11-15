@@ -58,10 +58,10 @@ module.exports = {
             let beforeTime = moment('08:30:00', 'hh:mm:ss');
             let afterTime = moment('17:30:00', 'hh:mm:ss');
             deliveryTime = moment(deliveryTime);
-            if(moment(deliveryTime).isBetween(afterTime , beforeTime) ){
+            if((deliveryTime.hours() >=8 && deliveryTime.minutes() <= 30 ) && ((deliveryTime.hours() <=17 && deliveryTime.minutes() <= 30 )) ){
                 console.log('is between')
             }
-            if (moment(deliveryTime).isBetween(beforeTime , afterTime) && deliveryTime.isoWeekday() <= 6) {
+            if ((deliveryTime.hours() >=8 && deliveryTime.minutes() <= 30 ) && ((deliveryTime.hours() <=17 && deliveryTime.minutes() <= 30 )) && deliveryTime.isoWeekday() <= 6) {
                 serial += "WH"
             } else {
                 serial += "NWH"
