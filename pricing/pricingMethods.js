@@ -26,7 +26,18 @@ module.exports = {
         return total;
     },
 
-    indexJobItemPricing: async (jobItem, job, type) => {
+    indexJobItemPricing: async (jobItem, jobObj, type) => {
+        const job = await Job.findOne({_id:jobObj._id}).populate({
+            path: 'pickupDetails',
+            model: 'pickupDetails',
+            populate: [
+                {
+                    path: 'pickupLocation',
+                    model: 'pickupLocations'
+                }
+            ]
+        }).select();
+        console.log(job)
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
