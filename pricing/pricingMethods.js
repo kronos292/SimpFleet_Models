@@ -58,6 +58,9 @@ module.exports = {
             }
         }
         let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
+        if (!JobItemPriceIndex){
+            return 0;
+        }
         return JobItemPriceIndex.price;
     }
 };
