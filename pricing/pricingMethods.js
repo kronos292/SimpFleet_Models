@@ -63,5 +63,17 @@ module.exports = {
             return 0;
         }
         return JobItemPriceIndex.price;
+    },
+    getOfflandingPrice: async (uom) => {
+        let serial = 'O';
+        if (uom === 'Pallet') {
+            serial += 'P'
+        }
+        let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
+        if (!JobItemPriceIndex){
+            return 0;
+        }
+        return JobItemPriceIndex.price;
     }
+
 };
