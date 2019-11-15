@@ -55,13 +55,16 @@ module.exports = {
                 console.log("No loading Time");
                 return 0;
             }
-            let beforeTime = moment('08:30:00', 'hh:mm:ss');
-            let afterTime = moment('17:30:00', 'hh:mm:ss');
             deliveryTime = moment(deliveryTime);
-            if((deliveryTime.hours() >=8 && deliveryTime.minutes() <= 30 ) && ((deliveryTime.hours() <=17 && deliveryTime.minutes() <= 30 )) ){
-                console.log('is between')
+            let workingHours = false;
+            if (deliveryTime.hours() > 8 && deliveryTime.hours() <17){
+                workingHours = true;
+            }else if( deliveryTime.hours() === 8 && deliveryTime.minutes() >= 30){
+                workingHours = true;
+            }else if(deliveryTime.hours() === 17 && deliveryTime.minutes() <= 30){
+                workingHours = true;
             }
-            if ((deliveryTime.hours() >=8 && deliveryTime.minutes() <= 30 ) && ((deliveryTime.hours() <=17 && deliveryTime.minutes() <= 30 )) && deliveryTime.isoWeekday() <= 6) {
+            if (workingHours && deliveryTime.isoWeekday() <= 6) {
                 serial += "WH"
             } else {
                 serial += "NWH"
