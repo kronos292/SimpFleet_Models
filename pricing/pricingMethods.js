@@ -30,44 +30,48 @@ module.exports = {
         const job = await Job.findOne({_id: jobObj._id}).populate({
             path: 'vesselLoadingLocation',
             model: 'vesselLoadingLocations'
+        }).populate({
+            path: 'pickupDetails',
+            model: 'pickupDetails',
+            populate: [
+                {
+                    path: 'pickupLocation',
+                    model: 'pickupLocations'
+                }
+            ]
         }).select();
 
         let serial = '';
         if (type === 'Delivery') {
-            serial += 'D'
+            serial += 'D';
+            let deliveryTime;
+            if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
+                //for now use berthing time, eventually might need change to delivery time
+                deliveryTime = job.psaBerthingDateTime;
+            } else if (job.vesselLoadingDateTime) {
+                deliveryTime = job.vesselLoadingDateTime
+            } else {
+                //if no time return 0 price
+                console.log("No loading Time");
+                return 0;
+            }
+            let beforeTime = moment('08:30:00', 'hh:mm:ss');
+            let afterTime = moment('17:30:00', 'hh:mm:ss');
+            deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
+            if(moment(deliveryTime).isBetween(beforeTime , afterTime)){
+                console.log('is between')
+            }
+            console.log(deliveryTime.isoWeekday() + 'day')
+            if (moment(deliveryTime).isBetween(beforeTime , afterTime) && deliveryTime.isoWeekday() <= 6) {
+                serial += "WH"
+            } else {
+                serial += "NWH"
+            }
         } else if (type === 'Collection') {
-            serial += 'C'
-        } else if (type === 'Offlanding') {
-            serial += 'O';
+            serial += 'C';
+            serial += "WH";
         }
         let quantity = jobItem.quantity;
-        let deliveryTime;
-        if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
-            //for now use berthing time, eventually might need change to delivery time
-            deliveryTime = job.psaBerthingDateTime;
-        } else if (job.vesselLoadingDateTime) {
-            deliveryTime = job.vesselLoadingDateTime
-        } else {
-            //if no time return 0 price
-            console.log("No loading Time");
-            return 0;
-        }
-        let beforeTime = moment('08:30:00', 'hh:mm:ss');
-        let afterTime = moment('17:30:00', 'hh:mm:ss');
-        deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-        if(moment(deliveryTime).isBefore(moment({hour: 17, minute: 30}))){
-            console.log('before 1730')
-        }
-        if(moment(deliveryTime).isAfter(moment({hour: 8, minute: 30}))){
-            console.log('after 830')
-        }
-        console.log(deliveryTime.isoWeekday() + 'day')
-
-        if (moment(deliveryTime).isBefore(moment({hour: 17, minute: 30})) && moment(deliveryTime).isAfter(moment({hour: 8, minute: 30})) && deliveryTime.isoWeekday() <= 6) {
-            serial += "WH"
-        } else {
-            serial += "NWH"
-        }
         if (jobItem.uom === 'Pallet') {
             if (quantity <= 5) {
                 serial += quantity + 'P';
