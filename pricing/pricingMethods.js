@@ -2,7 +2,7 @@ const DeliveryPricingTimeRange = require('../models/DeliveryPricingTimeRange');
 const Job = require('../models/Job');
 const JobDeliveryItemPricing = require('../models/JobDeliveryItemPricing');
 const JobItemPriceIndex = require('../models/JobItemPriceIndex');
-const moment = require('moment-timezone');
+const moment = require('moment');
 
 module.exports = {
     calculateDeliveryPricing: async (jobItems) => {
@@ -57,11 +57,11 @@ module.exports = {
             }
             let beforeTime = moment('08:30:00', 'hh:mm:ss');
             let afterTime = moment('17:30:00', 'hh:mm:ss');
-            deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-            if(moment(deliveryTime).isBetween(afterTime , beforeTime)){
+            deliveryTime = moment(deliveryTime);
+            if(moment(deliveryTime).isBetween(afterTime , beforeTime) ){
                 console.log('is between')
             }
-            if (moment(deliveryTime).isBetween(afterTime , beforeTime) && deliveryTime.isoWeekday() <= 6) {
+            if (moment(deliveryTime).isBetween(beforeTime , afterTime) && deliveryTime.isoWeekday() <= 6) {
                 serial += "WH"
             } else {
                 serial += "NWH"
