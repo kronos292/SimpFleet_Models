@@ -28,6 +28,8 @@ module.exports = {
 
     indexJobItemPricing: async (jobItem, type) => {
         const job = await Job.findOne({_id:jobItem.job}).select();
+        console.log(jobItem)
+        console.log(job)
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
@@ -40,11 +42,14 @@ module.exports = {
         let afterTime = moment('17:30:00', 'hh:mm:ss');
         let quantity = jobItem.quantity;
         let deliveryTime;
-        if (job.vesselLoadingLocation.type === 'port') {
+        if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
             //for now use berthing time, eventually might need change to delivery time
             deliveryTime = job.psaBerthingDateTime;
-        } else {
+        } else if (job.vesselLoadingDateTime){
             deliveryTime = job.vesselLoadingDateTime
+        }else{
+            //if no time return 0 price
+            return 0;
         }
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
         if (moment(deliveryTime, 'hh:mm:ss').isBetween(beforeTime, afterTime) && deliveryTime.isoWeekday() <= 6) {
