@@ -44,9 +44,6 @@ module.exports = {
         let afterTime = moment('17:30:00', 'hh:mm:ss');
         let quantity = jobItem.quantity;
         let deliveryTime;
-        console.log(job);
-        console.log(job.vesselLoadingLocation);
-        console.log(job.vesselLoadingLocation.type);
         if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
             //for now use berthing time, eventually might need change to delivery time
             deliveryTime = job.psaBerthingDateTime;
@@ -54,6 +51,7 @@ module.exports = {
             deliveryTime = job.vesselLoadingDateTime
         }else{
             //if no time return 0 price
+            console.log("No loading Time");
             return 0;
         }
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
@@ -71,6 +69,7 @@ module.exports = {
         }
         let jobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
         if (!jobItemPriceIndex){
+            console.log("Index does not exist");
             return 0;
         }
         return jobItemPriceIndex.price;
