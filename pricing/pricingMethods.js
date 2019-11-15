@@ -1,4 +1,5 @@
 const DeliveryPricingTimeRange = require('../models/DeliveryPricingTimeRange');
+const Job = require('../models/Job');
 const JobDeliveryItemPricing = require('../models/JobDeliveryItemPricing');
 const JobItemPriceIndex = require('../models/JobItemPriceIndex');
 const moment = require('moment-timezone');
@@ -26,7 +27,7 @@ module.exports = {
     },
 
     indexJobItemPricing: async (jobItem, type) => {
-        const job = jobItem.job;
+        const job = await Job.findOne({_id:jobItem.job}).select();
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
