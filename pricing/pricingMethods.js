@@ -55,7 +55,7 @@ module.exports = {
             return 0;
         }
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-        if (moment(deliveryTime, 'hh:mm:ss').isBetween(beforeTime, afterTime) && deliveryTime.isoWeekday() <= 6) {
+        if (moment(deliveryTime, 'hh:mm:ss').isBetween(afterTime,beforeTime) && deliveryTime.isoWeekday() <= 6) {
             serial += "WH"
         } else {
             serial += "NWH"
