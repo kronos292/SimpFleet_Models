@@ -55,7 +55,15 @@ module.exports = {
         let beforeTime = moment('08:30:00', 'hh:mm:ss');
         let afterTime = moment('17:30:00', 'hh:mm:ss');
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-        if (moment(deliveryTime).isBefore(moment({hour: 17, minute: 30}) ) && moment(deliveryTime).isAfter(moment({hour: 8, minute: 30})) && deliveryTime.isoWeekday() <= 6) {
+        if(moment(deliveryTime).isBefore(moment({hour: 17, minute: 30}))){
+            console.log('before 1730')
+        }
+        if(moment(deliveryTime).isAfter(moment({hour: 8, minute: 30}))){
+            console.log('after 830')
+        }
+        console.log(deliveryTime.isoWeekday() + 'day')
+
+        if (moment(deliveryTime).isBefore(moment({hour: 17, minute: 30})) && moment(deliveryTime).isAfter(moment({hour: 8, minute: 30})) && deliveryTime.isoWeekday() <= 6) {
             serial += "WH"
         } else {
             serial += "NWH"
