@@ -28,16 +28,10 @@ module.exports = {
 
     indexJobItemPricing: async (jobItem, jobObj, type) => {
         const job = await Job.findOne({_id:jobObj._id}).populate({
-            path: 'pickupDetails',
-            model: 'pickupDetails',
-            populate: [
-                {
-                    path: 'pickupLocation',
-                    model: 'pickupLocations'
-                }
-            ]
+            path: 'vesselLoadingLocation',
+            model: 'vesselLoadingLocations'
         }).select();
-        console.log(job)
+
         let serial = '';
         if (type === 'Delivery'){
             serial += 'D'
