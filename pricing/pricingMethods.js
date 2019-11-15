@@ -68,6 +68,8 @@ module.exports = {
         let serial = 'O';
         if (uom === 'Pallet') {
             serial += 'P'
+        }else if(uom === 'Import Permit'){
+            serial += 'IP'
         }
         let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
         if (!JobItemPriceIndex){
