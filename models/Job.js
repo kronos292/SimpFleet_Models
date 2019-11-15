@@ -37,6 +37,7 @@ const jobSchema = new Schema({
     psaVoyageNumberOut: {type: String, default: ""},
     psaBerf: {type: String, default: ""},
     telegramMessageId: {type: String, default: ""},
+    jobPrices:[{type: Schema.Types.ObjectId, ref: 'jobPrices'}],
 });
 
 module.exports = mongoose.model('jobs', jobSchema);

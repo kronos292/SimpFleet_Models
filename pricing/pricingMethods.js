@@ -44,19 +44,18 @@ module.exports = {
         } else {
             serial += "NWH"
         }
-        if (quantity === 1) {
-            serial += "1"
-        } else if (quantity === 2) {
-            serial += "2"
-        } else if (quantity === 3 || quantity === 4) {
-            serial += "3"
-        } else if (quantity === 5) {
-            serial += "5"
-        } else {
-            serial += "6"
-        }
-        if (jobItem.uom === 'Pallet'){
-            serial += 'P'
+        if (jobItem.uom === 'Pallet') {
+            if (quantity === 1) {
+                serial += "1P"
+            } else if (quantity === 2) {
+                serial += "2P"
+            } else if (quantity === 3 || quantity === 4) {
+                serial += "3P"
+            } else if (quantity === 5) {
+                serial += "5P"
+            } else {
+                serial += "6P"
+            }
         }
         let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
         return JobItemPriceIndex.price;
