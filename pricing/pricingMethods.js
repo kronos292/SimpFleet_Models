@@ -25,9 +25,16 @@ module.exports = {
         return total;
     },
 
-    indexJobItemPricing: async (jobItem) => {
+    indexJobItemPricing: async (jobItem, type) => {
         const job = jobItem.job;
         let serial = '';
+        if (type === 'Delivery'){
+            serial += 'D'
+        } else if(type === 'Collection'){
+            serial += 'C'
+        } else if(type==='Offlanding'){
+            serial += 'O';
+        }
         let beforeTime = moment('08:30:00', 'hh:mm:ss');
         let afterTime = moment('17:30:00', 'hh:mm:ss');
         let quantity = jobItem.quantity;
