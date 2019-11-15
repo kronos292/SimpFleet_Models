@@ -52,14 +52,8 @@ module.exports = {
             serial += "NWH"
         }
         if (jobItem.uom === 'Pallet') {
-            if (quantity === 1) {
-                serial += "1P"
-            } else if (quantity === 2) {
-                serial += "2P"
-            } else if (quantity === 3 || quantity === 4) {
-                serial += "3P"
-            } else if (quantity === 5) {
-                serial += "5P"
+            if (quantity <= 5) {
+                serial += quantity + 'P';
             } else {
                 serial += "6P"
             }
