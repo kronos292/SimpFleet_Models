@@ -45,6 +45,8 @@ module.exports = {
         let quantity = jobItem.quantity;
         let deliveryTime;
         console.log(job);
+        console.log(job.vesselLoadingLocation);
+        console.log(job.vesselLoadingLocation.type);
         if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
             //for now use berthing time, eventually might need change to delivery time
             deliveryTime = job.psaBerthingDateTime;
