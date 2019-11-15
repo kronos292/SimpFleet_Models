@@ -27,35 +27,35 @@ module.exports = {
     },
 
     indexJobItemPricing: async (jobItem, jobObj, type) => {
-        const job = await Job.findOne({_id:jobObj._id}).populate({
+        const job = await Job.findOne({_id: jobObj._id}).populate({
             path: 'vesselLoadingLocation',
             model: 'vesselLoadingLocations'
         }).select();
 
         let serial = '';
-        if (type === 'Delivery'){
+        if (type === 'Delivery') {
             serial += 'D'
-        } else if(type === 'Collection'){
+        } else if (type === 'Collection') {
             serial += 'C'
-        } else if(type==='Offlanding'){
+        } else if (type === 'Offlanding') {
             serial += 'O';
         }
-        let beforeTime = moment('08:30:00', 'hh:mm:ss');
-        let afterTime = moment('17:30:00', 'hh:mm:ss');
         let quantity = jobItem.quantity;
         let deliveryTime;
         if (job.vesselLoadingLocation.type === 'port' && job.psaBerthingDateTime) {
             //for now use berthing time, eventually might need change to delivery time
             deliveryTime = job.psaBerthingDateTime;
-        } else if (job.vesselLoadingDateTime){
+        } else if (job.vesselLoadingDateTime) {
             deliveryTime = job.vesselLoadingDateTime
-        }else{
+        } else {
             //if no time return 0 price
             console.log("No loading Time");
             return 0;
         }
+        let beforeTime = moment('08:30:00', 'hh:mm:ss');
+        let afterTime = moment('17:30:00', 'hh:mm:ss');
         deliveryTime = moment.tz(new Date(deliveryTime), "Asia/Singapore");
-        if (moment(deliveryTime, 'hh:mm:ss').isBetween(afterTime,beforeTime) && deliveryTime.isoWeekday() <= 6) {
+        if (moment(deliveryTime).isBefore(moment({hour: 17, minute: 30})  && moment(deliveryTime).isAfter(moment({hour: 8, minute: 30}) && deliveryTime.isoWeekday() <= 6) {
             serial += "WH"
         } else {
             serial += "NWH"
@@ -67,26 +67,28 @@ module.exports = {
                 serial += "6P"
             }
         }
-        let jobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
-        if (!jobItemPriceIndex){
+        let jobItemPriceIndex = await JobItemPriceIndex.findOne({index: serial}).select();
+        if (!jobItemPriceIndex) {
             console.log(serial + " index does not exist");
             return 0;
         }
-        console.log(serial + "found @ " + jobItemPriceIndex.price);
+        console.log(serial + " found @ " + jobItemPriceIndex.price);
         return jobItemPriceIndex.price;
     },
     getOfflandingPrice: async (uom) => {
         let serial = 'O';
         if (uom === 'Pallet') {
             serial += 'P'
-        }else if(uom === 'Import Permit'){
+        } else if (uom === 'Import Permit') {
             serial += 'IP'
         }
-        let JobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
-        if (!JobItemPriceIndex){
+        let jobItemPriceIndex = await JobItemPriceIndex.findOne({index: serial}).select();
+        if (!jobItemPriceIndex) {
+            console.log(serial + " index does not exist");
             return 0;
         }
-        return JobItemPriceIndex.price;
+        console.log(serial + " found @ " + jobItemPriceIndex.price);
+        return jobItemPriceIndex.price;
     }
 
 };
