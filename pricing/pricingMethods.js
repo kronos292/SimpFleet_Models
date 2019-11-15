@@ -72,6 +72,7 @@ module.exports = {
             console.log(serial + " index does not exist");
             return 0;
         }
+        console.log(serial + "found @ " + jobItemPriceIndex.price);
         return jobItemPriceIndex.price;
     },
     getOfflandingPrice: async (uom) => {
