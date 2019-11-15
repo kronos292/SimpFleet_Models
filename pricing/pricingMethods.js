@@ -69,7 +69,7 @@ module.exports = {
         }
         let jobItemPriceIndex = await JobItemPriceIndex.findOne({index:serial}).select();
         if (!jobItemPriceIndex){
-            console.log("Index does not exist");
+            console.log(serial + " index does not exist");
             return 0;
         }
         return jobItemPriceIndex.price;
