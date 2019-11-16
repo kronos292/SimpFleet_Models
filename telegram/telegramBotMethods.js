@@ -191,7 +191,7 @@ async function sendLocation(job, message) {
 
     if (location !== null) {
         await api.sendLocation({
-            chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
+            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
             longitude: location.lng,
             latitude: location.lat,
             reply_to_message_id: message.message_id
@@ -214,7 +214,7 @@ async function sendAdminJobBookingInfo(job) {
         }
 
         const res = await axios.post(`https://api.telegram.org/bot${keys.SIMPFLEET_TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
+            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
             text: jobDetails,
             reply_markup: {
                 "inline_keyboard": [keyboardButtons]
