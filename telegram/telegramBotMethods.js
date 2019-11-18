@@ -234,7 +234,7 @@ async function sendAdminJobUpdateInfo(job) {
 
     try {
         const message = await api.sendMessage({
-            chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+            chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
             text: jobDetails
         });
 
