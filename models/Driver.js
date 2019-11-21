@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
+
 const { Schema } = mongoose;
 
 const schema = new Schema({
@@ -8,28 +9,27 @@ const schema = new Schema({
     type: String,
     trim: true,
     required: true,
-
     default: ""
   },
   phonenumber: {
     type: String,
-    default: "",
     trim: true,
-    required: true
+    required: true,
+    default: ""
   },
   email: {
     type: String,
     unique: true,
-    default: "",
     trim: true,
-    required: true
+    required: true,
+    default: ""
   },
   company: {
     type: String,
     unique: true,
-    default: "",
     trim: true,
-    required: true
+    required: true,
+    default: ""
   },
   password: {
     type: String,
@@ -37,8 +37,8 @@ const schema = new Schema({
     trim: true,
     required: true
   },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordToken: { type: String, default: "" },
+  resetPasswordExpiry: { type: String, default: "" }
 });
 
 // generating a hash
