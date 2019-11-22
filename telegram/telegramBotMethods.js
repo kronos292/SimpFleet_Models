@@ -349,11 +349,13 @@ module.exports = {
         }).select();
         const {logisticsCompany} = jobAssignment;
 
-        // Send job details to company designated group chat
-        await api.sendMessage({
-            chat_id: logisticsCompany.telegramGroupChatId,
-            text: jobDetails
-        });
+        if(logisticsCompany){
+            // Send job details to company designated group chat
+            await api.sendMessage({
+                chat_id: logisticsCompany.telegramGroupChatId,
+                text: jobDetails
+            });
+        }
     },
     documentCreationMessage,
     jobCancellationConfirmation,
