@@ -5,38 +5,16 @@ const jwt = require("jsonwebtoken");
 const { Schema } = mongoose;
 
 const schema = new Schema({
-  username: {
-    type: String,
-    trim: true,
-    required: true,
-    default: ""
-  },
-  phonenumber: {
-    type: String,
-    trim: true,
-    required: true,
-    default: ""
-  },
-  email: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
-    default: ""
-  },
-  company: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
-    default: ""
-  },
-  password: {
-    type: String,
-    default: "",
-    trim: true,
-    required: true
-  },
+  firstName: { type: String, default: "" },
+  lastName: { type: String, default: "" },
+  password: { type: String, default: "" },
+  email: { type: String, default: "" },
+  companyName: { type: String, default: "" },
+  contactNumber: { type: String, default: "" },
+  userType: { type: String, default: "" },
+  isApproved: { type: Boolean, default: false },
+  token: { type: String, default: "" },
+  registerDate: { type: Date, default: new Date() },
   resetPasswordToken: { type: String, default: "" },
   resetPasswordExpiry: { type: String, default: "" }
 });
