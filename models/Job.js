@@ -6,7 +6,7 @@ const jobSchema = new Schema({
     vessel: {type: Schema.Types.ObjectId, ref: 'vessels'},
     jobTrackers: [{type: Schema.Types.ObjectId, ref: 'jobTrackers'}],
     paymentTrackers: [{type: Schema.Types.ObjectId, ref: 'paymentTrackers'}],
-    vesselLoadingLocation: {type: String, default: ''},
+    vesselLoadingLocation: {type: Schema.Types.ObjectId, ref: 'vesselLoadingLocations'},
     vesselLoadingLocationObj: {type: Schema.Types.ObjectId, ref: 'vesselLoadingLocations'},
     otherVesselLoadingLocation: {type: String, default: ''},
     user: {type: Schema.Types.ObjectId, ref: 'users'},
@@ -37,6 +37,7 @@ const jobSchema = new Schema({
     psaVoyageNumberOut: {type: String, default: ""},
     psaBerf: {type: String, default: ""},
     telegramMessageId: {type: String, default: ""},
+    jobPrices:[{type: Schema.Types.ObjectId, ref: 'jobPrices'}],
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
