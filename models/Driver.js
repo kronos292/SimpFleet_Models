@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
-const jwt = require("jsonwebtoken");
 
 const { Schema } = mongoose;
 
 const schema = new Schema({
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
-  userName: { type: String, default: "", unique: true },
-  email: { type: String, default: "", unique: true },
+  userName: { type: String, default: "" },
+  email: { type: String, default: "" },
   password: { type: String, default: "" },
   companyName: { type: String, default: "" },
   contactNumber: { type: String, default: "" },
