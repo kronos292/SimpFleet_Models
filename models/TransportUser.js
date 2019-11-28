@@ -15,6 +15,9 @@ const schema = new Schema({
   isApproved: { type: Boolean, default: false },
   file: [
     {
+      subject: {
+        type: String
+      },
       fileName: {
         type: String
       },
