@@ -26,6 +26,10 @@ const schema = new Schema({
       },
       fileType: {
         type: String
+      },
+      dateCreateAt: {
+        type: Date,
+        default: new Date()
       }
     }
   ],
