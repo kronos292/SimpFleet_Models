@@ -21,6 +21,9 @@ const schema = new Schema({
       fileName: {
         type: String
       },
+      filePath: {
+        typr: String
+      },
       fileType: {
         type: String
       }
