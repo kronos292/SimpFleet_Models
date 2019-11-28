@@ -22,7 +22,7 @@ const schema = new Schema({
         type: String
       },
       filePath: {
-        typr: String
+        type: String
       },
       fileType: {
         type: String
