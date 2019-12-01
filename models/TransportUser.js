@@ -13,26 +13,6 @@ const schema = new Schema({
   contactNumber: { type: String, default: "" },
   userType: { type: String, default: "" },
   isApproved: { type: Boolean, default: false },
-  file: [
-    {
-      subject: {
-        type: String
-      },
-      fileName: {
-        type: String
-      },
-      filePath: {
-        type: String
-      },
-      fileType: {
-        type: String
-      },
-      dateCreateAt: {
-        type: Date,
-        default: new Date()
-      }
-    }
-  ],
   token: { type: String, default: "" },
   registerDate: { type: Date, default: new Date() },
   resetPasswordToken: { type: String, default: "" },
