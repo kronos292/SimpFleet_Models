@@ -18,6 +18,10 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
   timeUploaded: {
     type: Date,
     default: new Date()
