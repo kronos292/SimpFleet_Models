@@ -14,6 +14,10 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  fileType: {
+    type: String,
+    default: ""
+  },
   fileFor: {
     type: String,
     default: ""
