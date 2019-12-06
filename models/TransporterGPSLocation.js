@@ -5,7 +5,7 @@ const schema = new Schema({
     lng: {type: Number, default: 0},
     lat: {type: Number, default: 0},
     user: {type: Schema.Types.ObjectId, ref: 'transportUsers'},
-    timestamp: {type: String, default: ""}
+    timestamp: {type: Date, default: new Date()}
 });
 
 module.exports = mongoose.model('transporterGPSLocations', schema);
