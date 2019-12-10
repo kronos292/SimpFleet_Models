@@ -6,7 +6,6 @@ const { Schema } = mongoose;
 const schema = new Schema({
   firstName: { type: String, default: "" },
   lastName: { type: String, default: "" },
-  userName: { type: String, default: "" },
   email: { type: String, default: "" },
   password: { type: String, default: "" },
   companyName: { type: String, default: "" },
