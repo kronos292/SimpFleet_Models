@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const schema = new Schema({
-    driver: {type: Schema.Types.ObjectId, ref: 'drivers'},
+    driver: { type: Schema.Types.ObjectId, ref: 'transportUsers'},
     truck: {type: Schema.Types.ObjectId, ref: 'trucks'},
     origin: {type: Schema.Types.ObjectId, ref: 'locations'},
     destination: {type: Schema.Types.ObjectId, ref: 'locations'},
