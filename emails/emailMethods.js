@@ -599,13 +599,13 @@ module.exports = {
 
         let statusUpdate;
         if (index === 3) {
-            statusUpdate = "Our warehouse is currently waiting for the arrival of your items.";
+            statusUpdate = "We have confirmed your job booking. Your job details have been passed to our operations side for processing.";
         } else if (index === 4) {
-            statusUpdate = "Our warehouse has received all of your items, and are ready to deliver at the allotted time.";
+            statusUpdate = "We have picked up/received all of your indicated items. We will proceed to check that everything is in order.";
         } else if (index === 5) {
-            statusUpdate = "We are currently on the way to deliver your items to the delivery location.";
+            statusUpdate = "Your items have been checked and loaded onto our trucks. It is currently on the way to the delivery destination.";
         } else if (index === 6) {
-            statusUpdate = "We have successfully delivered your items to the vessel.";
+            statusUpdate = "Your items have been successfully received by the customer.";
         }
 
         let pickupLocationsStringArray = [];
