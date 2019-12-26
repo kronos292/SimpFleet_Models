@@ -103,7 +103,7 @@ async function formJobMessage(job, status) {
         messageString += `Please help us to create a DSA for the Job Items.\n`;
     }
     if (job.hasBoarding) {
-        messageString += `Boarding Officer will be coming along for this job.\n`;
+        messageString += `\nBoarding Officer will be coming along for this job.\n`;
     }
     messageString += '\n';
     if (job.pickup) {
