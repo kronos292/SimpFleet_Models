@@ -212,7 +212,7 @@ async function sendAdminJobBookingInfo(job) {
             const logisticsCompany = logisticsCompanies[i];
             keyboardButtons.push({
                 text: logisticsCompany.name,
-                callback_data: `job_assignment ${logisticsCompany._id}`
+                callback_data: `job_assignment ${logisticsCompany._id} ${job._id}`
             });
         }
 
