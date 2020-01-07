@@ -318,25 +318,6 @@ async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
     }
 }
 
-async function sendVesselTrackerInfo(vesselTracker) {
-    const {vessel, vesselArrivalDateTime, psaBerthingDateTime, psaUnberthingDateTime} = vesselTracker;
-    let text = `Tracking Vessel: ${vessel.vesselName}\n\n`;
-    if(vesselArrivalDateTime) {
-        text += `Vessel Arrival: ${moment.tz(new Date(vesselArrivalDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
-    }
-    if(psaBerthingDateTime) {
-        text += `PSA Berthing DateTime: ${moment.tz(new Date(psaBerthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
-    }
-    if(psaUnberthingDateTime) {
-        text += `PSA Unberthing DateTime: ${moment.tz(new Date(psaUnberthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
-    }
-
-    await api.sendMessage({
-        chat_id: keys.SIMPFLEET_VESSEL_TRACKER_CHAT_ID,
-        text
-    });
-}
-
 async function sendErrorLogs(err) {
     await api.sendMessage({
         chat_id: keys.SIMPFLEET_TELEGRAM_ERROR_LOG_CHAT_ID,
@@ -387,6 +368,5 @@ module.exports = {
     jobBerthQCAdminUpdate,
     sendLighterBerthCallArrivalInformation,
     sendLighterBerthCallDepartureInformation,
-    sendErrorLogs,
-    sendVesselTrackerInfo
+    sendErrorLogs
 };
