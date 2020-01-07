@@ -10,7 +10,8 @@ const schema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'users'},
     psaBerthingDateTime: {type: Date, default: null},
     psaUnberthingDateTime: {type: Date, default: null},
-    vesselArrivalDateTime: {type: Date, default: null}
+    vesselArrivalDateTime: {type: Date, default: null},
+    telegramChatId: {type: String, default: ''}
 });
 
 module.exports = mongoose.model('vesselTrackers', schema);
