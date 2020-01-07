@@ -321,13 +321,13 @@ async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
 async function sendVesselTrackerInfo(vesselTracker) {
     const {vessel, vesselArrivalDateTime, psaBerthingDateTime, psaUnberthingDateTime} = vesselTracker;
     let text = `Tracking Vessel: ${vessel.vesselName}\n\n`;
-    if(vesselArrivalDateTime !== null) {
+    if(vesselArrivalDateTime) {
         text += `Vessel Arrival: ${moment.tz(new Date(vesselArrivalDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
     }
-    if(psaBerthingDateTime !== null) {
+    if(psaBerthingDateTime) {
         text += `PSA Berthing DateTime: ${moment.tz(new Date(psaBerthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
     }
-    if(psaUnberthingDateTime !== null) {
+    if(psaUnberthingDateTime) {
         text += `PSA Unberthing DateTime: ${moment.tz(new Date(psaUnberthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
     }
 
