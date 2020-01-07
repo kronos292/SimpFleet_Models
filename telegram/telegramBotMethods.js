@@ -318,6 +318,25 @@ async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
     }
 }
 
+async function sendVesselTrackerInfo(vesselTracker) {
+    const {vessel, vesselArrivalDateTime, psaBerthingDateTime, psaUnberthingDateTime} = vesselTracker;
+    let text = `Tracking Vessel: ${vessel.vesselName}\n\n`;
+    if(vesselArrivalDateTime !== null) {
+        text += `Vessel Arrival: ${moment.tz(new Date(vesselArrivalDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
+    }
+    if(psaBerthingDateTime !== null) {
+        text += `PSA Berthing DateTime: ${moment.tz(new Date(psaBerthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
+    }
+    if(psaUnberthingDateTime !== null) {
+        text += `PSA Unberthing DateTime: ${moment.tz(new Date(psaUnberthingDateTime), "Asia/Singapore").format('MMM DD YYYY HH:mm')}\n`;
+    }
+
+    await api.sendMessage({
+        chat_id: keys.SIMPFLEET_VESSEL_TRACKER_CHAT_ID,
+        text
+    });
+}
+
 async function sendErrorLogs(err) {
     await api.sendMessage({
         chat_id: keys.SIMPFLEET_TELEGRAM_ERROR_LOG_CHAT_ID,
