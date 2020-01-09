@@ -15,7 +15,8 @@ const schema = new Schema({
   token: { type: String, default: "" },
   registerDate: { type: Date, default: new Date() },
   resetPasswordToken: { type: String, default: "" },
-  resetPasswordExpiry: { type: String, default: "" }
+  resetPasswordExpiry: { type: String, default: "" },
+  company: {type: Schema.Types.ObjectId, ref: 'logisticsCompanies'}
 });
 
 // generating a hash
