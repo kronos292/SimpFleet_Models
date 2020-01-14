@@ -15,6 +15,11 @@ const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
 });
 
+async function dateTimeFormatter(date) {
+    // return moment.tz(date, "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+    return moment.tz(date, "America/Los_Angeles").format('MMMM DD YYYY, HH:mm');
+}
+
 async function qcDateTimeParser(dateTimeString) {
     const day = Number(dateTimeString.split(" ")[0].split("/")[0]);
     const month = Number(dateTimeString.split(" ")[0].split("/")[1]);
@@ -30,9 +35,9 @@ async function formJobMessage(job, status) {
 
     const vessel = job.vessel;
 
-    const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? moment.tz(new Date(job.vesselLoadingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
-    const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? moment.tz(new Date(job.psaBerthingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
-    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? moment.tz(new Date(job.psaUnberthingDateTime), "Asia/Singapore").format('MMMM Do YYYY, HH:mm') : "";
+    const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
+    const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
+    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
 
 
     const items = job.jobItems;
@@ -109,7 +114,7 @@ async function formJobMessage(job, status) {
     if (job.pickup) {
         messageString += `Please pick up from following locations:\n`;
         for (let i = 0; i < job.pickupDetails.length; i++) {
-            const pickUpDateTime = moment.tz(new Date(job.pickupDetails[i].pickupDateTime), "Asia/Singapore").format('DD MMMM YYYY, HH:mm');
+            const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
             messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
         }
     }
@@ -255,8 +260,8 @@ async function jobBerthTimingUpdate(job) {
     messageString += `Job Number: ${job.jobId}\n`;
     messageString += `Company: ${job.user.userCompany.name}\n`;
     messageString += `Vessel: ${vessel.vesselName}\n`;
-    messageString += `Berthing Time: ${moment.tz(new Date(job.psaBerthingDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}\n`;
-    messageString += `Unberthing Time: ${moment.tz(new Date(job.psaUnberthingDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}\n`;
+    messageString += `Berthing Time: ${await dateTimeFormatter(new Date(job.psaBerthingDateTime))}\n`;
+    messageString += `Unberthing Time: ${await dateTimeFormatter(new Date(job.psaUnberthingDateTime))}\n`;
     messageString += `Berf: ${job.psaBerf}\n`;
 
     await api.sendMessage({
@@ -271,7 +276,7 @@ async function jobBerthQCAdminUpdate(vessels) {
         for (let i = 0; i < vessels.length; i++) {
             const vessel = vessels[i];
 
-            text += `${vessel['Vessel Name']}: From ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time From']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')} to ${moment.tz(await qcDateTimeParser(vessel['QC Seq Time To']), "Asia/Singapore").format('MMMM DD YYYY, HH:mm')}. \n`;
+            text += `${vessel['Vessel Name']}: From ${await dateTimeFormatter(await qcDateTimeParser(vessel['QC Seq Time From']))} to ${await dateTimeFormatter(await qcDateTimeParser(vessel['QC Seq Time To']))}. \n`;
         }
 
         await api.sendMessage({
