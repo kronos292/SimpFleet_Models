@@ -17,7 +17,7 @@ const api = new telegram({
 
 async function dateTimeFormatter(date) {
     // return moment.tz(date, "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-    return moment.tz(date, "America/Los_Angeles").format('MMMM DD YYYY, HH:mm');
+    return moment.tz(date, "Pacific/Galapagos").format('MMMM DD YYYY, HH:mm');
 }
 
 async function qcDateTimeParser(dateTimeString) {
