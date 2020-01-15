@@ -132,8 +132,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
@@ -190,8 +192,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
@@ -437,8 +441,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
@@ -496,8 +502,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
@@ -612,8 +620,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
@@ -774,8 +784,10 @@ module.exports = {
         if(job.pickupDetails) {
             for (let i = 0; i < job.pickupDetails.length; i++) {
                 const pickupDetail = job.pickupDetails[i];
-                const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupLocations), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
-                pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
             }
         }
 
