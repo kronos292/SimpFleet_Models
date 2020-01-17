@@ -12,6 +12,32 @@ async function getTemplatePath(templateName) {
     return path.join(__dirname, 'templates', templateName);
 }
 
+async function sendEmail(templateName, toEmail, subject, ccList, locals) {
+    const email = new Email({
+        message: {
+            from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
+        },
+        send: true,
+        transport: nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
+                pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
+            }
+        })
+    });
+
+    email.send({
+        template: await getTemplatePath(templateName),
+        message: {
+            to: toEmail,
+            subject,
+            cc: ccList
+        },
+        locals
+    }).then(console.log).catch(console.error);
+}
+
 module.exports = {
     sendAutomatedEmail: async (email, subject, htmlText, attachments) => {
         // Generate email
@@ -48,20 +74,6 @@ module.exports = {
         });
     },
     sendJobBookingAdminConfirmationEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -76,28 +88,20 @@ module.exports = {
             jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
         }
 
-
-        // List parties to CC
+        const templateName = 'jobBookingAdminConfirmation';
+        const toEmail = keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL;
+        const subject = `Confirmation Needed: Job booking for ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`;
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
-
-        email.send({
-            template: await getTemplatePath('jobBookingAdminConfirmation'),
-            message: {
-                to: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                subject: `Confirmation Needed: Job booking for ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`,
-                cc: ccList
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== ""? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, locals);
     },
     sendJobBookingAdminCancellationConfirmation: async(job) => {
         const email = new Email({
@@ -199,24 +203,24 @@ module.exports = {
             }
         }
 
-        // email.send({
-        //     template: await getTemplatePath('jobBookingLogisticsOrder'),
-        //     message: {
-        //         to: jobAssignment.logisticsCompany.correspondenceEmails,
-        //         subject: `Job booking for ${job.vessel !== null? `${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`: 'Non-Vessel Delivery'}`,
-        //         cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-        //     },
-        //     locals: {
-        //         user: job.user,
-        //         job,
-        //         itemString,
-        //         jobOfflandItemString,
-        //         pickupLocationsStringArray,
-        //         vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-        //         psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-        //         psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-        //     }
-        // }).then(console.log).catch(console.error);
+        email.send({
+            template: await getTemplatePath('jobBookingLogisticsOrder'),
+            message: {
+                to: jobAssignment.logisticsCompany.correspondenceEmails,
+                subject: `Job booking for ${job.vessel !== null? `${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`: 'Non-Vessel Delivery'}`,
+                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
+            },
+            locals: {
+                user: job.user,
+                job,
+                itemString,
+                jobOfflandItemString,
+                pickupLocationsStringArray,
+                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            }
+        }).then(console.log).catch(console.error);
     },
     sendJobBookingLogisticsUpdateEmail: async (job) => {
         const email = new Email({
@@ -312,24 +316,24 @@ module.exports = {
 
 
         if(jobAssignment.logisticsCompany.correspondenceEmails) {
-            // email.send({
-            //     template: await getTemplatePath('jobBookingLogisticsUpdate'),
-            //     message: {
-            //         to: jobAssignment.logisticsCompany.correspondenceEmails,
-            //         subject: `Job details update: ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`,
-            //         cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            //     },
-            //     locals: {
-            //         user: job.user,
-            //         job,
-            //         itemString,
-            //         jobOfflandItemString,
-            //         pickupLocationsStringArray,
-            //         vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            //         psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            //         psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            //     }
-            // }).then(console.log).catch(console.error);
+            email.send({
+                template: await getTemplatePath('jobBookingLogisticsUpdate'),
+                message: {
+                    to: jobAssignment.logisticsCompany.correspondenceEmails,
+                    subject: `Job details update: ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`,
+                    cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
+                },
+                locals: {
+                    user: job.user,
+                    job,
+                    itemString,
+                    jobOfflandItemString,
+                    pickupLocationsStringArray,
+                    vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+                    psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+                    psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+                }
+            }).then(console.log).catch(console.error);
         }
     },
     sendUserSignUpConfirmationEmail: async (user) => {
