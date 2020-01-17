@@ -12,7 +12,7 @@ async function getTemplatePath(templateName) {
     return path.join(__dirname, 'templates', templateName);
 }
 
-async function sendEmail(templateName, toEmail, subject, ccList, locals) {
+async function sendEmail(templateName, toEmail, subject, ccList, attachments, locals) {
     const email = new Email({
         message: {
             from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
@@ -32,7 +32,8 @@ async function sendEmail(templateName, toEmail, subject, ccList, locals) {
         message: {
             to: toEmail,
             subject,
-            cc: ccList
+            cc: ccList,
+            attachments
         },
         locals
     }).then(console.log).catch(console.error);
@@ -88,10 +89,12 @@ module.exports = {
             jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
         }
 
+        // Send out email via template
         const templateName = 'jobBookingAdminConfirmation';
         const toEmail = keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL;
         const subject = `Confirmation Needed: Job booking for ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`;
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
         const locals = {
             user: job.user,
             job,
@@ -101,23 +104,9 @@ module.exports = {
             psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
             psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
         };
-        await sendEmail(templateName, toEmail, subject, ccList, locals);
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendJobBookingAdminCancellationConfirmation: async(job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -143,41 +132,25 @@ module.exports = {
             }
         }
 
-
-        email.send({
-            template: await getTemplatePath('jobBookingAdminCancellationConfirmation'),
-            message: {
-                to: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                subject: `Job Cancellation Confirmed - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'jobBookingAdminCancellationConfirmation';
+        const toEmail = keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL;
+        const subject = `Job Cancellation Confirmed - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendJobBookingLogisticsOrderEmail: async (job, jobAssignment) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -203,40 +176,25 @@ module.exports = {
             }
         }
 
-        email.send({
-            template: await getTemplatePath('jobBookingLogisticsOrder'),
-            message: {
-                to: jobAssignment.logisticsCompany.correspondenceEmails,
-                subject: `Job booking for ${job.vessel !== null? `${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`: 'Non-Vessel Delivery'}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'jobBookingLogisticsOrder';
+        const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
+        const subject = `Job booking for ${job.vessel !== null? `${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`: 'Non-Vessel Delivery'}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== ""? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== ""? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== ""? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a'): "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendJobBookingLogisticsUpdateEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         let {jobItems, jobOfflandItems, careOffParties} = job;
 
         // Add items of care-off parties
@@ -314,70 +272,39 @@ module.exports = {
             model: 'logisticsCompanies'
         }).select();
 
-
         if(jobAssignment.logisticsCompany.correspondenceEmails) {
-            email.send({
-                template: await getTemplatePath('jobBookingLogisticsUpdate'),
-                message: {
-                    to: jobAssignment.logisticsCompany.correspondenceEmails,
-                    subject: `Job details update: ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`,
-                    cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-                },
-                locals: {
-                    user: job.user,
-                    job,
-                    itemString,
-                    jobOfflandItemString,
-                    pickupLocationsStringArray,
-                    vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                    psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                    psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                }
-            }).then(console.log).catch(console.error);
+            // Send out email via template
+            const templateName = 'jobBookingLogisticsUpdate';
+            const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
+            const subject = `Job ${job.index} details update: ${job.vessel.vesselName} IMO ${job.vessel.vesselIMOID}`;
+            const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+            const attachments = [];
+            const locals = {
+                user: job.user,
+                job,
+                itemString,
+                jobOfflandItemString,
+                pickupLocationsStringArray,
+                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            };
+            await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
         }
     },
     sendUserSignUpConfirmationEmail: async (user) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
-        email.send({
-            template: await getTemplatePath('userSignUpConfirmation'),
-            message: {
-                to: user.email,
-                subject: `Sign Up Confirmed`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user,
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userSignUpConfirmation';
+        const toEmail = user.email;
+        const subject = `Sign Up Confirmed`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendUserJobConfirmationEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -392,40 +319,24 @@ module.exports = {
             jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
         }
 
-        email.send({
-            template: await getTemplatePath('userJobBookingConfirmation'),
-            message: {
-                to: job.user.email,
-                subject: `Job Booking Confirmed - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== "" ? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userJobBookingConfirmation';
+        const toEmail = job.user.email;
+        const subject = `Job Booking Confirmed - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendUserJobApprovalEmail: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -451,42 +362,25 @@ module.exports = {
             }
         }
 
-
-        email.send({
-            template: await getTemplatePath('userJobBookingApproval'),
-            message: {
-                to: job.user.email,
-                subject: `Job Booking Approved - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== "" ? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userJobBookingApproval';
+        const toEmail = job.user.email;
+        const subject = `Job Booking Approved - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendUserJobCancellationConfirmation: async (job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
         for (let i = 1; i < items.length; i++) {
@@ -512,41 +406,25 @@ module.exports = {
             }
         }
 
-
-        email.send({
-            template: await getTemplatePath('userJobBookingCancellationConfirmation'),
-            message: {
-                to: job.user.email,
-                subject: `Job Cancellation Confirmed - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : ""
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userJobBookingCancellationConfirmation';
+        const toEmail = job.user.email;
+        const subject = `Job Cancellation Confirmed - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : ""
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendUserJobStatusUpdateEmail: async (job, index) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         let {jobItems, jobOfflandItems, careOffParties} = job;
 
         // Add items of care-off parties
@@ -630,43 +508,26 @@ module.exports = {
             }
         }
 
-
-        email.send({
-            template: await getTemplatePath('userJobStatusUpdate'),
-            message: {
-                to: job.user.email,
-                subject: `Job Status Update - ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: job.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                // vesselLighterDateTime: job.vesselLighterDateTime !== "" ? moment(new Date(job.vesselLighterDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                statusUpdate
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userJobStatusUpdate';
+        const toEmail = job.user.email;
+        const subject = `Job Status Update - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: job.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            statusUpdate
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendJobFileUploadLogisticsEmail: async (jobFile, job) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const {requirements} = jobFile;
         let signAndReturn = false;
         let needPrintCopy = false;
@@ -685,42 +546,26 @@ module.exports = {
             model: 'logisticsCompanies'
         }).select();
 
-        email.send({
-            template: await getTemplatePath('jobFileUploadLogistics'),
-            message: {
-                to: jobAssignment.logisticsCompany.correspondenceEmails,
-                subject: `New document submitted for job ${job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL],
-                attachments: [
-                    {
-                        filename: jobFile.filename,
-                        path: jobFile.fileURL
-                    }
-                ]
-            },
-            locals: {
-                job,
-                jobFile,
-                signAndReturn,
-                needPrintCopy
+        // Send out email via template
+        const templateName = 'jobFileUploadLogistics';
+        const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
+        const subject = `New document submitted for job ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [
+            {
+                filename: jobFile.filename,
+                path: jobFile.fileURL
             }
-        }).then(console.log).catch(console.error);
+        ];
+        const locals = {
+            job,
+            jobFile,
+            signAndReturn,
+            needPrintCopy
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendUserEmailReminderDocUpload: async (notification) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
         const {job} = notification;
         let {jobItems, jobOfflandItems, careOffParties} = job;
 
@@ -794,51 +639,35 @@ module.exports = {
             }
         }
 
-        email.send({
-            template: await getTemplatePath('userJobDocUploadReminder'),
-            message: {
-                to: notification.user.email,
-                subject: `Document Upload Reminder - Job ${notification.job.jobId}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                user: notification.user,
-                job,
-                itemString,
-                jobOfflandItemString,
-                pickupLocationsStringArray,
-                vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-                psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'userJobDocUploadReminder';
+        const toEmail = notification.user.email;
+        const subject = `Document Upload Reminder - Job ${notification.job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user: notification.user,
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
     sendJobLinkSharingInvite: async (userEmail, job, jobLink) => {
-        const email = new Email({
-            message: {
-                from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL
-            },
-            send: true,
-            transport: nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
-                    pass: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL_PASSWORD
-                }
-            })
-        });
-
-        email.send({
-            template: await getTemplatePath('jobLinkSharingInvite'),
-            message: {
-                to: userEmail,
-                subject: `Job Invite - ${job.vessel.vesselName}`,
-                cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL]
-            },
-            locals: {
-                job,
-                jobLink
-            }
-        }).then(console.log).catch(console.error);
+        // Send out email via template
+        const templateName = 'jobLinkSharingInvite';
+        const toEmail = userEmail;
+        const subject = `Job Invite - ${job.vessel.vesselName}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            job,
+            jobLink
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     }
 };
