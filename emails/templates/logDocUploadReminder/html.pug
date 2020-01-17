@@ -1,0 +1,22 @@
+doctype html
+html(lang='en')
+head
+  title Log document upload reminder
+body
+  .WordSection1
+    include ../salutation/html
+    br
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Thank you for helping us in the job delivery. Please revert or upload any signed DO & other necessary documents to our platform.
+        o:p
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | For your reference, here are the details of the job booking:
+        o:p
+    include ../jobDetails/html.pug
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | Please feel free to email us at service@simpfleet.com if you have any queries.
+        o:p
+    include ../signature/html.pug
