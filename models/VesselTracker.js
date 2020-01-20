@@ -11,7 +11,8 @@ const schema = new Schema({
     psaBerthingDateTime: {type: Date, default: null},
     psaUnberthingDateTime: {type: Date, default: null},
     vesselArrivalDateTime: {type: Date, default: null},
-    telegramChatId: {type: String, default: ''}
+    telegramChatId: {type: String, default: ''},
+    googleCalendarId: {type: String, default: ''}
 });
 
 module.exports = mongoose.model('vesselTrackers', schema);
