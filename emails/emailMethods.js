@@ -750,7 +750,7 @@ module.exports = {
             model: 'logisticsCompanies'
         }).select();
 
-        if(jobAssignment.logisticsCompany.correspondenceEmails) {
+        if(jobAssignment.logisticsCompany && jobAssignment.logisticsCompany.correspondenceEmails) {
             // Send out email via template
             const templateName = 'logDocUploadReminder';
             const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
