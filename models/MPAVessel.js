@@ -8,7 +8,8 @@ const schema = new Schema({
     vesselFlag: {type: String, default: ""},
     vesselType: {type: String, default: ""},
     vesselLocations: [{type: Schema.Types.ObjectId, ref: 'mpaVesselLocations'}],
-    vesselMovements: [{type: Schema.Types.ObjectId, ref: 'mpaVesselMovements'}]
+    vesselMovements: [{type: Schema.Types.ObjectId, ref: 'mpaVesselMovements'}],
+    mpaVesselSchedules: [{type: Schema.Types.ObjectId, ref: 'mpaVesselSchedules'}]
 });
 
 module.exports = mongoose.model('mpaVessels', schema);
