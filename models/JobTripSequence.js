@@ -12,7 +12,7 @@ const schema = new Schema({
     predictedEndDateTime: {type: Date, default: null},
     actualStartDateTime: {type: Date, default: null},
     actualEndDateTime: {type: Date, default: null},
-    type: {type: String, default: ''},
+    type: {type: String, default: ''}, // pickup, delivery, offland
     seqNumber: {type: Number, default: 0}
 });
 
