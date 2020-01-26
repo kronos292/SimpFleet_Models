@@ -7,7 +7,8 @@ const schema = new Schema({
     startTrip: {type: Date, default: null},
     endTrip: {type: Date, default: null},
     driver: {type: Schema.Types.ObjectId, ref: "transportUsers"},
-    id: {type: String, default: ""}
+    id: {type: String, default: ""},
+    jobTripCreationDateTime: {type: Date, default: null}
 });
 
 module.exports = mongoose.model("jobTrips", schema);
