@@ -1,7 +1,93 @@
 const Job = require('../models/Job');
 const moment = require('moment');
+const _ = require('lodash');
+
+// Pallet price list for Warehouse-Destination deliveries.
+const palletPricingWH = [
+    {
+        1: 55,
+        2: 35,
+        3: 30,
+        4: 25,
+        5: 25
+    },
+    {
+        1: 75,
+        2: 45,
+        3: 40,
+        4: 30,
+        5: 30
+    }
+];
+
+// Pallet price list for Pickup-Destination deliveries.
+const palletPricingPickup = [
+    {
+        1: 75,
+        2: 45,
+        3: 35,
+        4: 30,
+        5: 30
+    },
+    {
+        1: 95,
+        2: 55,
+        3: 45,
+        4: 35,
+        5: 35
+    }
+];
+
+// Truck based pricing.
+const truckPricing = [
+    {
+        0: 135,
+        1: 40
+    },
+    {
+        0: 155,
+        1: 40
+    }
+];
+
+// Function to find whether there is pickup in the job.
+async function checkForPickup(job) {
+    const {pickupDetails} = job;
+
+    return pickupDetails && pickupDetails.length > 0;
+}
+
+// Function to compute total item prices
+async function computeItemPricing(job) {
+    let totalPrice  = 0;
+    const hourIndex = 0;
+    const {jobItems} = job;
+
+    // Determine pallet price list.
+    const jobHasPickup = await checkForPickup(job);
+
+    // Retrieve price list via working hours.
+    const palletPriceList = jobHasPickup? palletPricingPickup[hourIndex]: palletPricingWH[hourIndex];
+    const truckPriceList = truckPricing[hourIndex];
+
+    // Compute pallet pricing
+    const jobItem = _.find(jobItems, function(jobItem) {
+        return jobItem.uom === 'Pallet';
+    });
+    if(jobItem.quantity >= 6) {
+        totalPrice += truckPriceList[hourIndex];
+    } else {
+        totalPrice += palletPriceList[jobItem.quantity];
+    }
+
+    return totalPrice;
+}
 
 module.exports = {
+    calculateJobPricing: async(job) => {
+        // Compute item pricing
+        return await computeItemPricing(job);
+    },
     calculateDeliveryPricing: async (jobItems) => {
         let total = 0;
         // for (let i = 0; i < jobItems.length; i++) {
@@ -101,5 +187,4 @@ module.exports = {
         // console.log(serial + " found @ " + jobItemPriceIndex.price);
         return 0;
     }
-
 };
