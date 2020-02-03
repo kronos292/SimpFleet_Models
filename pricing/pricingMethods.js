@@ -74,10 +74,12 @@ async function computeItemPricing(job) {
     const jobItem = _.find(jobItems, function(jobItem) {
         return jobItem.uom === 'Pallet';
     });
-    if(jobItem.quantity >= 6) {
-        totalPrice += truckPriceList[hourIndex];
-    } else {
-        totalPrice += palletPriceList[jobItem.quantity];
+    if(jobItem) {
+        if(jobItem.quantity >= 6) {
+            totalPrice += truckPriceList[hourIndex];
+        } else {
+            totalPrice += palletPriceList[jobItem.quantity];
+        }
     }
 
     return totalPrice;
