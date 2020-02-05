@@ -70,15 +70,18 @@ async function computeItemPricing(job) {
     const palletPriceList = jobHasPickup? palletPricingPickup[hourIndex]: palletPricingWH[hourIndex];
     const truckPriceList = truckPricing[hourIndex];
 
-    // Compute pallet pricing
-    const jobItem = _.find(jobItems, function(jobItem) {
-        return jobItem.uom === 'Pallet';
-    });
-    if(jobItem) {
-        if(jobItem.quantity >= 6) {
+    // Compute job item pricing
+    for(let i = 0; i < jobItems.length; i++) {
+        const jobItem = jobItems[i];
+        const {uom, quantity} = jobItem;
+        if(uom === 'Pallet' || uom === 'Carton') {
+            if(quantity >= 6) {
+                totalPrice += truckPriceList[hourIndex];
+            } else {
+                totalPrice += palletPriceList[jobItem.quantity];
+            }
+        } else if(uom === 'Pipe' || uom === 'Bundle') {
             totalPrice += truckPriceList[hourIndex];
-        } else {
-            totalPrice += palletPriceList[jobItem.quantity];
         }
     }
 
