@@ -39,6 +39,7 @@ const jobSchema = new Schema({
     psaBerf: {type: String, default: ""},
     telegramMessageId: {type: String, default: ""},
     jobPrices:[{type: Schema.Types.ObjectId, ref: 'jobPrices'}],
+    isDeleted: {type: Boolean, default: false} // For jobs that are accidentally created or for testing, and need to be removed from actual job count.
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
