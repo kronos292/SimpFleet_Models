@@ -91,7 +91,11 @@ async function computeItemPricing(job) {
 module.exports = {
     calculateJobPricing: async(job) => {
         // Compute item pricing
-        return await computeItemPricing(job);
+        const itemPricing = await computeItemPricing(job);
+
+        return {
+            "Item Pricing": itemPricing
+        };
     },
     calculateDeliveryPricing: async (jobItems) => {
         let total = 0;
