@@ -38,7 +38,8 @@ const jobSchema = new Schema({
     psaVoyageNumberOut: {type: String, default: ""},
     psaBerf: {type: String, default: ""},
     telegramMessageId: {type: String, default: ""},
-    jobPrices:[{type: Schema.Types.ObjectId, ref: 'jobPrices'}],
+    estimatedJobPriceBreakdown: [{type: Schema.Types.Mixed, default: {}}],
+    actualJobPriceBreakdown: [{type: Schema.Types.Mixed, default: {}}],
     isDeleted: {type: Boolean, default: false} // For jobs that are accidentally created or for testing, and need to be removed from actual job count.
 });
 
