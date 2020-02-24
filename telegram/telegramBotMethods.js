@@ -342,10 +342,12 @@ module.exports = {
         const {logisticsCompany} = jobAssignment;
 
         // Send job details to company designated group chat
-        await api.sendMessage({
-            chat_id: logisticsCompany.telegramGroupChatId,
-            text: jobDetails
-        });
+        if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
+            await api.sendMessage({
+                chat_id: logisticsCompany.telegramGroupChatId,
+                text: jobDetails
+            });
+        }
     },
     sendJobBookingUpdateInfo: async (job) => {
         const jobDetails = await formJobMessage(job, "Update");
@@ -357,7 +359,7 @@ module.exports = {
         }).select();
         const {logisticsCompany} = jobAssignment;
 
-        if(logisticsCompany){
+        if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
             // Send job details to company designated group chat
             await api.sendMessage({
                 chat_id: logisticsCompany.telegramGroupChatId,
