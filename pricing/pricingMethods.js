@@ -1,6 +1,7 @@
 const Job = require('../models/Job');
 const moment = require('moment');
 const _ = require('lodash');
+const getHolidays = require('public-holidays').getHolidays;
 
 // Pallet price list for Warehouse-Destination deliveries.
 const palletPricingWH = [
@@ -50,6 +51,18 @@ const truckPricing = [
     }
 ];
 
+// Function to check if the date is a public holiday.
+async function checkPublicHoliday(date) {
+    const holidays = await getHolidays({
+        country: 'sg',
+        lang: 'en',
+        start: date,
+        end: date
+    });
+
+    return holidays.length > 0
+}
+
 // Function to find whether there is pickup in the job.
 async function checkForPickup(job) {
     const {pickupDetails} = job;
@@ -57,10 +70,38 @@ async function checkForPickup(job) {
     return pickupDetails && pickupDetails.length > 0;
 }
 
+// Function to get the hour index of the job (WH or After-WH).
+async function getHourIndex(job) {
+    const {jobTrip} = job;
+    const {startTrip} = jobTrip;
+
+    // Check whether trip is starting during WH or After-WH datetime.
+    if(((startTrip.getDay() >= 1 && startTrip.getDay() <= 5) && moment(startTrip).isBetween(moment('08:30:00'), moment('17:30:00'))) || (startTrip.getDay() === 6 && moment(startTrip).isBetween(moment('08:30:00'), moment('12:30:00'))) || !await checkPublicHoliday(startTrip)) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+// Function to get the truck price
+async function getTruckPrice(job, truckPriceList) {
+    const {jobTrip} = job;
+    const {startTrip, endTrip} = jobTrip;
+    let totalPrice = truckPriceList[0];
+    const subCharge = truckPriceList[1];
+
+    // Calculate number of hours and thus multiply with subsequent charges.
+    const firstHours = 4;
+    let numHours = Math.ceil(moment(startTrip).diff(endTrip, 'hours') - firstHours);
+    totalPrice += numHours * subCharge;
+
+    return totalPrice;
+}
+
 // Function to compute total item prices
 async function computeItemPricing(job) {
     let totalPrice  = 0;
-    const hourIndex = 0;
+    const hourIndex = await getHourIndex(job);
     const {jobItems} = job;
 
     // Determine pallet price list.
@@ -76,12 +117,12 @@ async function computeItemPricing(job) {
         const {uom, quantity} = jobItem;
         if(uom === 'Pallet' || uom === 'Carton') {
             if(quantity >= 6) {
-                totalPrice += truckPriceList[hourIndex];
+                totalPrice += await getTruckPrice(job, truckPriceList);
             } else {
                 totalPrice += palletPriceList[jobItem.quantity];
             }
         } else if(uom === 'Pipe' || uom === 'Bundle') {
-            totalPrice += truckPriceList[hourIndex];
+            totalPrice += await getTruckPrice(job, truckPriceList);
         }
     }
 
@@ -90,12 +131,22 @@ async function computeItemPricing(job) {
 
 module.exports = {
     calculateJobPricing: async(job) => {
+        // Get Job Trip
+        const {jobTrip} = job;
+        if(!jobTrip) {
+            return null;
+        }
+
         // Compute item pricing
         const itemPricing = await computeItemPricing(job);
 
-        return {
-            "Item Pricing": itemPricing
-        };
+        return [
+            {
+                name: "Item Pricing",
+                description: "",
+                price: itemPricing
+            }
+        ];
     },
     calculateDeliveryPricing: async (jobItems) => {
         let total = 0;
