@@ -1,7 +1,9 @@
-const Job = require('../models/Job');
 const moment = require('moment');
 const _ = require('lodash');
 const getHolidays = require('public-holidays').getHolidays;
+
+const Job = require('../models/Job');
+const JobPricingBreakdown = require('../models/JobPricingBreakdown');
 
 // Pallet price list for Warehouse-Destination deliveries.
 const palletPricingWH = [
@@ -131,7 +133,7 @@ async function computeItemPricing(job) {
 }
 
 module.exports = {
-    calculateJobPricing: async(job) => {
+    tabulateJobPricingBreakdown: async(job) => {
         // Get Job Trip
         const {jobTrip} = job;
         if(!jobTrip) {
@@ -143,8 +145,8 @@ module.exports = {
 
         return [
             {
-                name: "Item Pricing",
-                description: "",
+                name: "Delivery charges",
+                description: "Delivery charges for items",
                 price: itemPricing
             }
         ];
