@@ -61,6 +61,9 @@ const truckPricing = [
 // Flat rate for offland pricing.
 const offlandPrice = 30;
 
+// Pricing breakdown to be set.
+let jobPricingBreakdowns = [];
+
 // Function to check if the date is a public holiday.
 async function checkPublicHoliday(date) {
     const holidays = await getHolidays({
@@ -111,6 +114,11 @@ async function getTruckPrice(job, truckPriceList) {
 
 // Function to compute price of job items.
 async function computeJobItemPrice(job, jobItems) {
+    const {index, jobId, vesselLoadingLocation, otherVesselLoadingLocation, vessel, jobTrip} = job;
+    const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
+    const {vesselName} = vessel;
+    const {startTrip} = jobTrip;
+
     const hourIndex = await getHourIndex(job);
     let totalPrice = 0;
 
@@ -138,46 +146,65 @@ async function computeJobItemPrice(job, jobItems) {
         }
     }
 
-    return totalPrice;
+    const name = "Delivery charges";
+    const description = `Delivery charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) to ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
+        + `Job Number: ${jobId}\n`
+        + `SimpFleet Job ID: ${index}\n`;
+    jobPricingBreakdowns.push({
+        name,
+        description,
+        price: totalPrice
+    });
 }
 
 // Function to compute price of offland items.
 async function computeOfflandItemPrice(job) {
-    const {jobItems, jobOfflandItems} = job;
+    const {index, jobItems, jobOfflandItems, jobId, vesselLoadingLocation, otherVesselLoadingLocation, vessel, jobTrip} = job;
+    const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
+    const {vesselName} = vessel;
+    const {startTrip} = jobTrip;
+
+    const hourIndex = await getHourIndex(job);
     let totalPrice = 0;
 
     if(jobOfflandItems && jobOfflandItems.length > 0) {
         if(jobItems && jobItems.length > 0) {
             totalPrice += offlandPrice;
         } else {
-            totalPrice += computeJobItemPrice(job, jobOfflandItems);
+            totalPrice += await computeJobItemPrice(job, jobOfflandItems);
         }
     }
+
+    const name = "Offland charges";
+    const description = `Offland charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) from ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
+        + `Job Number: ${jobId}\n`
+        + `SimpFleet Job ID: ${index}\n`;
+    jobPricingBreakdowns.push({
+        name,
+        description,
+        price: totalPrice
+    });
 
     return totalPrice;
 }
 
 // Function to compute urgent delivery charges.
 async function computeUrgentDeliveryPricing(job) {
-    const {jobTrip, jobBookingDateTime} = job;
+    const {index, jobId, jobTrip, jobBookingDateTime} = job;
     const {startTrip} = jobTrip;
-    return moment.duration(startTrip.diff(jobBookingDateTime)).asHours() < 4? 20: 0;
-}
 
-// Function to compute total item prices
-async function computeItemPricing(job) {
-    let totalPrice = 0;
-
-    // Compute job item pricing.
-    totalPrice += computeJobItemPrice(job, job.jobItems);
-
-    // Compute offland item pricing.
-    totalPrice += computeOfflandItemPrice(job);
-
-    // Compute any urgent delivery charges.
-    totalPrice += computeUrgentDeliveryPricing(job);
-
-    return totalPrice;
+    if(moment.duration(startTrip.diff(jobBookingDateTime)).asHours() < 4) {
+        const name = "Urgent job charges";
+        const description = `Urgent job charges.\n\n`
+            + `Job Number: ${jobId}\n`
+            + `SimpFleet Job ID: ${index}\n`;
+        const price = 20;
+        jobPricingBreakdowns.push({
+            name,
+            description,
+            price
+        });
+    }
 }
 
 module.exports = {
@@ -188,15 +215,18 @@ module.exports = {
             return null;
         }
 
-        // Compute item pricing
-        const itemPricing = await computeItemPricing(job);
+        // Reset job pricing breakdowns.
+        jobPricingBreakdowns = [];
 
-        return [
-            {
-                name: "Delivery charges",
-                description: "Delivery charges for items",
-                price: itemPricing
-            }
-        ];
+        // Compute job item pricing.
+        await computeJobItemPrice(job, job.jobItems);
+
+        // Compute offland item pricing.
+        await computeOfflandItemPrice(job);
+
+        // Compute any urgent delivery charges.
+        await computeUrgentDeliveryPricing(job);
+
+        return jobPricingBreakdowns;
     }
 };
