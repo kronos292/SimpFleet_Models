@@ -157,6 +157,13 @@ async function computeOfflandItemPrice(job) {
     return totalPrice;
 }
 
+// Function to compute urgent delivery charges.
+async function computeUrgentDeliveryPricing(job) {
+    const {jobTrip, jobBookingDateTime} = job;
+    const {startTrip} = jobTrip;
+    return moment.duration(startTrip.diff(jobBookingDateTime)).asHours() < 4? 20: 0;
+}
+
 // Function to compute total item prices
 async function computeItemPricing(job) {
     let totalPrice = 0;
@@ -166,6 +173,9 @@ async function computeItemPricing(job) {
 
     // Compute offland item pricing.
     totalPrice += computeOfflandItemPrice(job);
+
+    // Compute any urgent delivery charges.
+    totalPrice += computeUrgentDeliveryPricing(job);
 
     return totalPrice;
 }
