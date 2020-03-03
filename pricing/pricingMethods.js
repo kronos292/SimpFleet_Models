@@ -3,7 +3,12 @@ const _ = require('lodash');
 const getHolidays = require('public-holidays').getHolidays;
 
 const Job = require('../models/Job');
-const JobPricingBreakdown = require('../models/JobPricingBreakdown');
+
+// Carton price list for Warehouse-Destination deliveries.
+const cartonPricingWH = [40, 50];
+
+// Carton price list for Pickup-Destination deliveries.
+const cartonPricingPickup = [40, 50];
 
 // Pallet price list for Warehouse-Destination deliveries.
 const palletPricingWH = [
@@ -62,7 +67,7 @@ async function checkPublicHoliday(date) {
         end: date
     });
 
-    return holidays.length > 0
+    return holidays.length > 0;
 }
 
 // Function to find whether there is pickup in the job.
@@ -111,6 +116,7 @@ async function computeItemPricing(job) {
     const jobHasPickup = await checkForPickup(job);
 
     // Retrieve price list via working hours.
+    const cartonPrice = jobHasPickup? cartonPricingPickup[hourIndex]: cartonPricingWH[hourIndex];
     const palletPriceList = jobHasPickup? palletPricingPickup[hourIndex]: palletPricingWH[hourIndex];
     const truckPriceList = truckPricing[hourIndex];
 
@@ -118,7 +124,9 @@ async function computeItemPricing(job) {
     for(let i = 0; i < jobItems.length; i++) {
         const jobItem = jobItems[i];
         const {uom, quantity} = jobItem;
-        if(uom === 'Pallet' || uom === 'Carton') {
+        if(uom === 'Carton') {
+            totalPrice += cartonPrice;
+        } else if(uom === 'Pallet') {
             if(quantity >= 6) {
                 totalPrice += await getTruckPrice(job, truckPriceList);
             } else {
