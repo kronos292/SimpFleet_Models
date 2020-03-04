@@ -8,7 +8,9 @@ const schema = new Schema({
     dateTimePaid: {type: Date, default: new Date()},
     type: {type: String, default: ''}, // receivable, payable
     xeroId: {type: String, default: ''},
-    xeroNumber: {type: String, default: ''}
+    xeroNumber: {type: String, default: ''},
+    jobCharge: {type: Schema.Types.ObjectId, ref: 'jobCharges'},
+    jobPayment: {type: Schema.Types.ObjectId, ref: 'jobPayments'}
 });
 
 module.exports = mongoose.model('invoices', schema);
