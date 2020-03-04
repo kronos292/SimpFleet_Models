@@ -193,7 +193,7 @@ async function computeUrgentDeliveryPricing(job) {
     const {index, jobId, jobTrip, jobBookingDateTime} = job;
     const {startTrip} = jobTrip;
 
-    if(moment.duration(startTrip.diff(jobBookingDateTime)).asHours() < 4) {
+    if(moment.duration(moment(startTrip).diff(moment(jobBookingDateTime))).asHours() < 4) {
         const name = "Urgent job charges";
         const description = `Urgent job charges.\n\n`
             + `Job Number: ${jobId}\n`
