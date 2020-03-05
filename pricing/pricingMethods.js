@@ -146,15 +146,18 @@ async function computeJobItemPrice(job, jobItems) {
         }
     }
 
-    const name = "Delivery charges";
-    const description = `Delivery charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) to ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
-        + `Job Number: ${jobId}\n`
-        + `SimpFleet Job ID: ${index}\n`;
-    jobPricingBreakdowns.push({
-        name,
-        description,
-        price: totalPrice
-    });
+    // Check if job has deliveries.
+    if(jobItems && jobItems.length > 0) {
+        const name = "Delivery charges";
+        const description = `Delivery charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) to ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
+            + `Job Number: ${jobId}\n`
+            + `SimpFleet Job ID: ${index}\n`;
+        jobPricingBreakdowns.push({
+            name,
+            description,
+            price: totalPrice
+        });
+    }
 }
 
 // Function to compute price of offland items.
@@ -167,23 +170,24 @@ async function computeOfflandItemPrice(job) {
     const hourIndex = await getHourIndex(job);
     let totalPrice = 0;
 
+    // Check if job has offlanding.
     if(jobOfflandItems && jobOfflandItems.length > 0) {
         if(jobItems && jobItems.length > 0) {
             totalPrice += offlandPrice;
         } else {
             totalPrice += await computeJobItemPrice(job, jobOfflandItems);
         }
-    }
 
-    const name = "Offland charges";
-    const description = `Offland charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) from ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
-        + `Job Number: ${jobId}\n`
-        + `SimpFleet Job ID: ${index}\n`;
-    jobPricingBreakdowns.push({
-        name,
-        description,
-        price: totalPrice
-    });
+        const name = "Offland charges";
+        const description = `Offland charges (${hourIndex === 0? 'Working Hours': 'After Working Hours'}) from ${vesselName} on ${moment(startTrip).format("dddd, Do MMMM YYYY")} at ${vesselLoadingLocationName}.\n\n`
+            + `Job Number: ${jobId}\n`
+            + `SimpFleet Job ID: ${index}\n`;
+        jobPricingBreakdowns.push({
+            name,
+            description,
+            price: totalPrice
+        });
+    }
 
     return totalPrice;
 }
