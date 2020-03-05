@@ -10,7 +10,8 @@ const schema = new Schema({
     xeroId: {type: String, default: ''},
     xeroNumber: {type: String, default: ''},
     jobCharge: {type: Schema.Types.ObjectId, ref: 'jobCharges'},
-    jobPayment: {type: Schema.Types.ObjectId, ref: 'jobPayments'}
+    jobPayment: {type: Schema.Types.ObjectId, ref: 'jobPayments'},
+    fileURL: {type: String, default: ''}
 });
 
 module.exports = mongoose.model('invoices', schema);
