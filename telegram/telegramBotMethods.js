@@ -10,6 +10,7 @@ const PSABerth = require('../models/PSABerth');
 const LogisticsCompany = require('../models/LogisticsCompany');
 const UserCompany = require('../models/UserCompany');
 const PSAVessel = require('../models/PSAVessel');
+const Invoice = require('../models/accounts/Invoice');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
@@ -321,6 +322,25 @@ async function sendLighterBerthCallDepartureInformation(jpLighterBerthCall) {
             text
         });
     }
+}
+
+async function sendInvoiceFile(invoice) {
+    const {fileURL, status} = invoice;
+
+    let text = 'A draft invoice has been created.';
+    if(status === "Authorised") {
+        text = 'Approved invoice has been sent out via email to the customer.'
+    }
+
+    const message = await api.sendMessage({
+        chat_id: keys.SIMPFLEET_ACCOUNTS_TELEGRAM_CHAT_ID,
+        text
+    });
+    await api.sendDocument({
+        chat_id: keys.SIMPFLEET_ACCOUNTS_TELEGRAM_CHAT_ID,
+        document: fileURL,
+        reply_to_message_id: message.message_id
+    });
 }
 
 async function sendErrorLogs(err) {
