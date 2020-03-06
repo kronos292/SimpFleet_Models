@@ -395,5 +395,6 @@ module.exports = {
     jobBerthQCAdminUpdate,
     sendLighterBerthCallArrivalInformation,
     sendLighterBerthCallDepartureInformation,
-    sendErrorLogs
+    sendErrorLogs,
+    sendInvoiceFile
 };
