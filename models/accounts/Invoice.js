@@ -12,7 +12,7 @@ const schema = new Schema({
     jobCharge: {type: Schema.Types.ObjectId, ref: 'jobCharges'},
     jobPayment: {type: Schema.Types.ObjectId, ref: 'jobPayments'},
     fileURL: {type: String, default: ''},
-    status: {type: String, default: ''} // Draft, Submitted, Authorised, Paid
+    status: {type: String, default: 'Draft'} // Draft, Submitted, Authorised, Paid
 });
 
 module.exports = mongoose.model('invoices', schema);
