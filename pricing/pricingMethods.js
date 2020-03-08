@@ -106,8 +106,11 @@ async function getTruckPrice(job, truckPriceList) {
 
     // Calculate number of hours and thus multiply with subsequent charges.
     const firstHours = 4;
+    console.log(moment(startTrip).diff(endTrip, 'hours'));
+    console.log(Math.ceil(moment(startTrip).diff(endTrip, 'hours') - firstHours));
     let numHours = Math.ceil(moment(startTrip).diff(endTrip, 'hours') - firstHours);
     totalPrice += numHours * subCharge;
+    console.log(totalPrice);
 
     return totalPrice;
 }
