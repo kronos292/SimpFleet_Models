@@ -134,7 +134,7 @@ async function computeJobItemPrice(job, jobItems) {
         const jobItem = jobItems[i];
         const {uom, quantity} = jobItem;
         if(uom === 'Carton') {
-            totalPrice += cartonPrice;
+            totalPrice += cartonPrice * jobItem.quantity;
         } else if(uom === 'Pallet') {
             if(quantity >= 6) {
                 totalPrice += await getTruckPrice(job, truckPriceList);
