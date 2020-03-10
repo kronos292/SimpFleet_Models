@@ -9,6 +9,7 @@ const schema = new Schema({
     type: {type: String, default: ''}, // receivable, payable
     xeroId: {type: String, default: ''},
     xeroNumber: {type: String, default: ''},
+    xeroContactId: {type: String, default: ''},
     jobCharge: {type: Schema.Types.ObjectId, ref: 'jobCharges'},
     jobPayment: {type: Schema.Types.ObjectId, ref: 'jobPayments'},
     fileURL: {type: String, default: ''},
