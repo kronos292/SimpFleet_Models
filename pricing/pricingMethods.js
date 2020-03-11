@@ -90,7 +90,7 @@ async function getHourIndex(job) {
 
     // Check whether trip is starting during WH or After-WH datetime.
     const format = 'HH:mm:ss';
-    if(((startTrip.getDay() >= 1 && startTrip.getDay() <= 5) && moment(startTrip).isBetween(moment('08:30:00', format), moment('17:30:00', format))) || (startTrip.getDay() === 6 && moment(startTrip).isBetween(moment('08:30:00', format), moment('12:30:00', format))) || !await checkPublicHoliday(startTrip)) {
+    if((((startTrip.getDay() >= 1 && startTrip.getDay() <= 5) && moment(startTrip).isBetween(moment('08:30:00', format), moment('17:30:00', format))) || (startTrip.getDay() === 6 && moment(startTrip).isBetween(moment('08:30:00', format), moment('12:30:00', format)))) && !await checkPublicHoliday(startTrip)) {
         return 0;
     } else {
         return 1;
