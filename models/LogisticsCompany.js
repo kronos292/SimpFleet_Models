@@ -6,7 +6,8 @@ const schema = new Schema({
     name: {type: String, default: ""},
     location: {type: Schema.Types.ObjectId, ref: 'locations'},
     telegramGroupChatId: {type: String, default: ""},
-    correspondenceEmails: [{type: String, default: ""}]
+    correspondenceEmails: [{type: String, default: ""}],
+    trucks: [{type: Schema.Types.ObjectId, ref: 'trucks'}]
 });
 
 module.exports = mongoose.model('logisticsCompanies', schema);

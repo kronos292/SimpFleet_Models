@@ -3,7 +3,6 @@ const { Schema } = mongoose;
 
 const schema = new Schema({
     driver: { type: Schema.Types.ObjectId, ref: 'transportUsers'},
-    truck: {type: Schema.Types.ObjectId, ref: 'trucks'},
     origin: {type: Schema.Types.ObjectId, ref: 'locations'},
     destination: {type: Schema.Types.ObjectId, ref: 'locations'},
     job: {type: Schema.Types.ObjectId, ref: 'jobs'},
