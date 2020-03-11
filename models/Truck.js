@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const schema = new Schema({
+    id: {type: String, default: ''}, // SFT-1
     licenseNumber: {type: String, default: ''},
     type: {type: String, default: ''}, // OPEN, BOX, CANOPY
     size: {type: String, default: ''}, // ft size
