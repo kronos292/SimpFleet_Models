@@ -118,7 +118,7 @@ async function getTruckPrice(job, truckPriceList) {
 async function computeJobItemPrice(job, jobItems) {
     const {index, jobId, vesselLoadingLocation, otherVesselLoadingLocation, vessel, jobTrip} = job;
     const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
-    const {vesselName} = vessel;
+    const vesselName = vessel? vessel.vesselName: 'Non-vessel location';
     const {startTrip} = jobTrip;
 
     const hourIndex = await getHourIndex(job);
@@ -166,7 +166,7 @@ async function computeJobItemPrice(job, jobItems) {
 async function computeOfflandItemPrice(job) {
     const {index, jobItems, jobOfflandItems, jobId, vesselLoadingLocation, otherVesselLoadingLocation, vessel, jobTrip} = job;
     const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
-    const {vesselName} = vessel;
+    const vesselName = vessel? vessel.vesselName: 'Non-vessel location';
     const {startTrip} = jobTrip;
 
     const hourIndex = await getHourIndex(job);
