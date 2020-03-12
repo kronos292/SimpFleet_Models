@@ -7,7 +7,7 @@ const JobAssignment = require('../models/JobAssignment');
 
 const jobCostingBreakdowns = [];
 
-async function isWorkingHours(jobTrip, logisticsCompany) {
+async function checkWorkingHours(jobTrip, logisticsCompany) {
     const {startTrip} = jobTrip;
     const workingHoursList = workingHours[logisticsCompany.id];
     const day = startTrip.getDay();
@@ -104,7 +104,7 @@ async function tabulateJobCostBreakdown(jobTrip) {
     const {logisticsCompany} = jobAssignment;
 
     // Get working hour key.
-    const isWorkingHours = await isWorkingHours(jobTrip, logisticsCompany);
+    const isWorkingHours = await checkWorkingHours(jobTrip, logisticsCompany);
     const WHKey = isWorkingHours? 'WH': 'AWH';
 
     // Get truck costing.
