@@ -9,7 +9,9 @@ const schema = new Schema({
     driver: {type: Schema.Types.ObjectId, ref: "transportUsers"},
     id: {type: String, default: ""},
     jobTripCreationDateTime: {type: Date, default: new Date()},
-    truck: {type: Schema.Types.ObjectId, ref: 'trucks'}
+    truck: {type: Schema.Types.ObjectId, ref: 'trucks'},
+    estimatedJobCostingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobCostingBreakdowns'}],
+    actualJobCostingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobCostingBreakdowns'}]
 });
 
 module.exports = mongoose.model("jobTrips", schema);
