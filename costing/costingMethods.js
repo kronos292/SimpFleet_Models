@@ -114,3 +114,7 @@ async function tabulateJobCostBreakdown(job) {
 
     return jobCostingBreakdowns;
 }
+
+module.exports = {
+    tabulateJobCostBreakdown
+};
