@@ -7,8 +7,7 @@ const JobAssignment = require('../models/JobAssignment');
 
 const jobCostingBreakdowns = [];
 
-async function isWorkingHours(job, logisticsCompany) {
-    const {jobTrip} = job;
+async function isWorkingHours(jobTrip, logisticsCompany) {
     const {startTrip} = jobTrip;
     const workingHoursList = workingHours[logisticsCompany.id];
     const day = startTrip.getDay();
@@ -21,9 +20,10 @@ async function isWorkingHours(job, logisticsCompany) {
     return false;
 }
 
-async function tabulateTruckCosting(job, logisticsCompany, WHKey) {
+async function tabulateTruckCosting(jobTrip, logisticsCompany, WHKey) {
     // Get truck and timings from job trip.
-    const {jobTrip, vessel, vesselLoadingLocation, otherVesselLoadingLocation} = job;
+    const job = jobTrip.jobs[0];
+    const {vessel, vesselLoadingLocation, otherVesselLoadingLocation} = job;
     const {truck} = jobTrip;
     const {startTrip, endTrip} = jobTrip;
     const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
@@ -94,8 +94,9 @@ async function tabulateGST() {
     }
 }
 
-async function tabulateJobCostBreakdown(job) {
+async function tabulateJobCostBreakdown(jobTrip) {
     // Get Logistics Company.
+    const job = jobTrip.jobs[0];
     const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
         path: 'logisticsCompany',
         model: 'logisticsCompanies'
@@ -103,11 +104,11 @@ async function tabulateJobCostBreakdown(job) {
     const {logisticsCompany} = jobAssignment;
 
     // Get working hour key.
-    const isWorkingHours = await isWorkingHours(job, logisticsCompany);
+    const isWorkingHours = await isWorkingHours(jobTrip, logisticsCompany);
     const WHKey = isWorkingHours? 'WH': 'AWH';
 
     // Get truck costing.
-    await tabulateTruckCosting(job, logisticsCompany, WHKey);
+    await tabulateTruckCosting(jobTrip, logisticsCompany, WHKey);
 
     // Calculate GST.
     await tabulateGST();
