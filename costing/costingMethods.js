@@ -97,25 +97,29 @@ async function tabulateGST() {
 }
 
 async function tabulateJobCostBreakdown(jobTrip) {
-    // Get Logistics Company.
-    const job = jobTrip.jobs[0];
-    const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
-        path: 'logisticsCompany',
-        model: 'logisticsCompanies'
-    }).select();
-    const {logisticsCompany} = jobAssignment;
+    try {
+        // Get Logistics Company.
+        const job = jobTrip.jobs[0];
+        const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
+            path: 'logisticsCompany',
+            model: 'logisticsCompanies'
+        }).select();
+        const {logisticsCompany} = jobAssignment;
 
-    // Get working hour key.
-    const isWorkingHours = await checkWorkingHours(jobTrip, logisticsCompany);
-    const WHKey = isWorkingHours? 'WH': 'AWH';
+        // Get working hour key.
+        const isWorkingHours = await checkWorkingHours(jobTrip, logisticsCompany);
+        const WHKey = isWorkingHours? 'WH': 'AWH';
 
-    // Get truck costing.
-    await tabulateTruckCosting(jobTrip, logisticsCompany, WHKey);
+        // Get truck costing.
+        await tabulateTruckCosting(jobTrip, logisticsCompany, WHKey);
 
-    // Calculate GST.
-    await tabulateGST();
-
-    return jobCostingBreakdowns;
+        // Calculate GST.
+        await tabulateGST();
+    } catch(err) {
+        console.log(err);
+    } finally {
+        return jobCostingBreakdowns;
+    }
 }
 
 module.exports = {
