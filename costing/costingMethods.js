@@ -11,10 +11,12 @@ async function checkWorkingHours(jobTrip, logisticsCompany) {
     const {startTrip} = jobTrip;
     const workingHoursList = workingHours[logisticsCompany.id];
     const day = startTrip.getDay();
-    const workingHoursIndex = workingHoursList[day];
-    if(workingHoursIndex) {
-        const format = 'HH:mm:ss';
-        return moment(startTrip).isBetween(moment(workingHoursIndex.start, format), moment(workingHoursIndex.end, format));
+    if(workingHoursList) {
+        const workingHoursIndex = workingHoursList[day];
+        if(workingHoursIndex) {
+            const format = 'HH:mm:ss';
+            return moment(startTrip).isBetween(moment(workingHoursIndex.start, format), moment(workingHoursIndex.end, format));
+        }
     }
 
     return false;
