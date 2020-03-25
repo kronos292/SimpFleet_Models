@@ -380,7 +380,7 @@ module.exports = {
             const {userCompany} = job.user;
             if(userCompany && userCompany.telegramGroupChatId && userCompany.telegramGroupChatId.trim() !== '') {
                 await api.sendMessage({
-                    chat_id: logisticsCompany.telegramGroupChatId,
+                    chat_id: userCompany.telegramGroupChatId,
                     text: jobDetails
                 });
             }
@@ -415,7 +415,7 @@ module.exports = {
             const {userCompany} = job.user;
             if(userCompany && userCompany.telegramGroupChatId && userCompany.telegramGroupChatId.trim() !== '') {
                 await api.sendMessage({
-                    chat_id: logisticsCompany.telegramGroupChatId,
+                    chat_id: userCompany.telegramGroupChatId,
                     text: jobDetails
                 });
             }
