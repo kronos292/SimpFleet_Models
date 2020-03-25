@@ -106,14 +106,16 @@ async function formJobMessage(job, status) {
         }
     }
     if (job.createDSA) {
-        messageString += `Please help us to create a DSA for the Job Items.\n`;
+        messageString += `A DSA is to be created for the Job Items.\n`;
     }
     if (job.hasBoarding) {
-        messageString += `\nBoarding Officer will be coming along for this job.\n`;
+        messageString += `\nBoarding Officer will be provided for this job.\n`;
+    } else {
+        messageString += `\nThere will be no Boarding Officer for this job.\n`;
     }
     messageString += '\n';
     if (job.pickup) {
-        messageString += `Please pick up from following locations:\n`;
+        messageString += `Pick up from the following locations:\n`;
         for (let i = 0; i < job.pickupDetails.length; i++) {
             const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
             messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
@@ -362,11 +364,28 @@ module.exports = {
         const {logisticsCompany} = jobAssignment;
 
         // Send job details to company designated group chat
-        if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
-            await api.sendMessage({
-                chat_id: logisticsCompany.telegramGroupChatId,
-                text: jobDetails
-            });
+        try {
+            if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
+                await api.sendMessage({
+                    chat_id: logisticsCompany.telegramGroupChatId,
+                    text: jobDetails
+                });
+            }
+        } catch(err) {
+            console.log(err);
+        }
+
+        // Get user company and send to company group chat.
+        try {
+            const {userCompany} = job.user;
+            if(userCompany && userCompany.telegramGroupChatId && userCompany.telegramGroupChatId.trim() !== '') {
+                await api.sendMessage({
+                    chat_id: logisticsCompany.telegramGroupChatId,
+                    text: jobDetails
+                });
+            }
+        } catch(err) {
+            console.log(err);
         }
     },
     sendJobBookingUpdateInfo: async (job) => {
@@ -379,12 +398,29 @@ module.exports = {
         }).select();
         const {logisticsCompany} = jobAssignment;
 
-        if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
-            // Send job details to company designated group chat
-            await api.sendMessage({
-                chat_id: logisticsCompany.telegramGroupChatId,
-                text: jobDetails
-            });
+        // Send job details to company designated group chat
+        try {
+            if(logisticsCompany && logisticsCompany.telegramGroupChatId.trim() !== '') {
+                await api.sendMessage({
+                    chat_id: logisticsCompany.telegramGroupChatId,
+                    text: jobDetails
+                });
+            }
+        } catch(err) {
+            console.log(err);
+        }
+
+        // Get user company and send to company group chat.
+        try {
+            const {userCompany} = job.user;
+            if(userCompany && userCompany.telegramGroupChatId && userCompany.telegramGroupChatId.trim() !== '') {
+                await api.sendMessage({
+                    chat_id: logisticsCompany.telegramGroupChatId,
+                    text: jobDetails
+                });
+            }
+        } catch(err) {
+            console.log(err);
         }
     },
     documentCreationMessage,
