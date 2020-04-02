@@ -25,7 +25,8 @@ const schema = new Schema({
     vesselConsortium: {type: String, default: ""},
     vesselConsortiumName: {type: String, default: ""},
     vesselConsortiumMembers: {type: String, default: ""},
-    timestamp: {type: Date, default: new Date()}
+    timestamp: {type: Date, default: new Date()},
+    vessel: {type: Schema.Types.ObjectId, ref: 'vessels'}
 });
 
 module.exports = mongoose.model('psaVessels', schema);
