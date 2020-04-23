@@ -9,7 +9,7 @@ const schema = new Schema({
     driver: {type: Schema.Types.ObjectId, ref: "transportUsers"},
     id: {type: String, default: ""},
     jobTripCreationDateTime: {type: Date, default: new Date()},
-    vehicles: {type: Schema.Types.ObjectId, ref: 'vehicles'},
+    vehicle: {type: Schema.Types.ObjectId, ref: 'vehicles'},
     estimatedJobCostingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobCostingBreakdowns'}],
     actualJobCostingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobCostingBreakdowns'}]
 });
