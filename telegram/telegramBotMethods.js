@@ -11,8 +11,8 @@ const LogisticsCompany = require('../models/LogisticsCompany');
 const UserCompany = require('../models/UserCompany');
 const PSAVessel = require('../models/PSAVessel');
 const Invoice = require('../models/accounts/Invoice');
-const TransporterGPSLocation = require('../models/accounts/TransporterGPSLocation');
-const TransporterGPSTracking = require('../models/accounts/TransporterGPSTracking');
+const TransporterGPSLocation = require('../models/TransporterGPSLocation');
+const TransporterGPSTracking = require('../models/TransporterGPSTracking');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
