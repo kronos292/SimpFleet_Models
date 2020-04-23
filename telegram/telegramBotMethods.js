@@ -389,19 +389,31 @@ async function sendTransportLiveLocation(user, jobTrip) {
 
 // Update driver's live location to admin telegram chat.
 async function updateTransportLiveLocation(transporterGPSTracking) {
-    const {user, telegramMessageId} = transporterGPSTracking;
+    const {user, jobTrip, telegramMessageId} = transporterGPSTracking;
     const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
 
     if(transporterGPSLocation) {
         const {lat, lng} = transporterGPSLocation;
 
-        await api.editMessageLiveLocation({
-            chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-            latitude: lat,
-            longitude: lng,
-            live_period: 86400,
-            message_id: telegramMessageId
-        });
+        // Send updated location message and location.
+        try {
+            const text = `All items for Job Trip ${jobTrip.id} are currently on the way to delivery location.`;
+            let message = await api.sendMessage({
+                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                text
+            });
+            message = await api.sendLocation({
+                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                latitude: lat,
+                longitude: lng,
+                live_period: 86400,
+                reply_to_message_id: message.message_id
+            });
+            transporterGPSTracking.telegramMessageId = message.message_id;
+            await transporterGPSTracking.save();
+        } catch(err) {
+            console.log(err);
+        }
     }
 }
 
