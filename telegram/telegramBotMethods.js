@@ -362,7 +362,7 @@ async function sendTransportLiveLocation(user, jobTrip) {
         startDateTime: new Date()
     });
 
-    const transporterGPSLocation = await TransporterGPSLocation.findOne({user}).sort({timestamp: -1}).select();
+    const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
     console.log(transporterGPSLocation);
     if(transporterGPSLocation) {
         const {lat, lng} = transporterGPSLocation;
@@ -381,7 +381,7 @@ async function sendTransportLiveLocation(user, jobTrip) {
 // Update driver's live location to admin telegram chat.
 async function updateTransportLiveLocation(transporterGPSTracking) {
     const {user, telegramMessageId} = transporterGPSTracking;
-    const transporterGPSLocation = await TransporterGPSLocation.findOne({user}).sort({timestamp: -1}).select();
+    const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
 
     if(transporterGPSLocation) {
         const {lat, lng} = transporterGPSLocation;
