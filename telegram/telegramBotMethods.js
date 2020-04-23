@@ -363,17 +363,26 @@ async function sendTransportLiveLocation(user, jobTrip) {
     });
 
     const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
-    console.log(transporterGPSLocation);
     if(transporterGPSLocation) {
         const {lat, lng} = transporterGPSLocation;
 
-        const message = await api.sendLocation({
-            chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-            latitude: lat,
-            longitude: lng,
-            live_period: 86400
-        });
-        transporterGPSTracking.telegramMessageId = message.message_id;
+        try {
+            const text = `All items for Job Trip ${jobTrip.id} have been picked up/Received.`;
+            let message = await api.sendMessage({
+                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                text,
+                reply_to_message_id: message.message_id
+            });
+            message = await api.sendLocation({
+                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                latitude: lat,
+                longitude: lng,
+                live_period: 86400
+            });
+            transporterGPSTracking.telegramMessageId = message.message_id;
+        } catch(err) {
+            console.log(err);
+        }
     }
     await transporterGPSTracking.save();
 }
