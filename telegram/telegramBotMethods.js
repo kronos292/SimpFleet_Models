@@ -405,6 +405,16 @@ async function updateTransportLiveLocation(transporterGPSTracking) {
     }
 }
 
+// Stop driver's live location to admin telegram chat.
+async function stopTransportLiveLocation(transporterGPSTracking) {
+    const {telegramMessageId} = transporterGPSTracking;
+
+    await api.stopMessageLiveLocation({
+        chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+        message_id: telegramMessageId
+    });
+}
+
 module.exports = {
     sendJobBookingInfo: async (job) => {
         const jobDetails = await formJobMessage(job, "Create");
@@ -487,5 +497,6 @@ module.exports = {
     sendErrorLogs,
     sendInvoiceFile,
     sendTransportLiveLocation,
-    updateTransportLiveLocation
+    updateTransportLiveLocation,
+    stopTransportLiveLocation
 };
