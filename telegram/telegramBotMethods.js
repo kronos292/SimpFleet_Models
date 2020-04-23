@@ -11,6 +11,8 @@ const LogisticsCompany = require('../models/LogisticsCompany');
 const UserCompany = require('../models/UserCompany');
 const PSAVessel = require('../models/PSAVessel');
 const Invoice = require('../models/accounts/Invoice');
+const TransporterGPSLocation = require('../models/accounts/TransporterGPSLocation');
+const TransporterGPSTracking = require('../models/accounts/TransporterGPSTracking');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
@@ -352,6 +354,48 @@ async function sendErrorLogs(err) {
     });
 }
 
+// Send driver's live location to admin telegram chat.
+async function sendTransportLiveLocation(user, jobTrip) {
+    const transporterGPSTracking = new TransporterGPSTracking({
+        user,
+        jobTrip,
+        startDateTime: new Date()
+    });
+
+    const transporterGPSLocation = await TransporterGPSLocation.findOne({user}).sort({timestamp: -1}).select();
+    console.log(transporterGPSLocation);
+    if(transporterGPSLocation) {
+        const {lat, lng} = transporterGPSLocation;
+
+        const message = await api.sendLocation({
+            chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+            latitude: lat,
+            longitude: lng,
+            live_period: 86400
+        });
+        transporterGPSTracking.telegramMessageId = message.message_id;
+    }
+    await transporterGPSTracking.save();
+}
+
+// Update driver's live location to admin telegram chat.
+async function updateTransportLiveLocation(transporterGPSTracking) {
+    const {user, telegramMessageId} = transporterGPSTracking;
+    const transporterGPSLocation = await TransporterGPSLocation.findOne({user}).sort({timestamp: -1}).select();
+
+    if(transporterGPSLocation) {
+        const {lat, lng} = transporterGPSLocation;
+
+        await api.editMessageLiveLocation({
+            chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+            latitude: lat,
+            longitude: lng,
+            live_period: 86400,
+            message_id: telegramMessageId
+        });
+    }
+}
+
 module.exports = {
     sendJobBookingInfo: async (job) => {
         const jobDetails = await formJobMessage(job, "Create");
@@ -432,5 +476,7 @@ module.exports = {
     sendLighterBerthCallArrivalInformation,
     sendLighterBerthCallDepartureInformation,
     sendErrorLogs,
-    sendInvoiceFile
+    sendInvoiceFile,
+    sendTransportLiveLocation,
+    updateTransportLiveLocation
 };
