@@ -367,17 +367,17 @@ async function sendTransportLiveLocation(user, jobTrip) {
         const {lat, lng} = transporterGPSLocation;
 
         try {
-            const text = `All items for Job Trip ${jobTrip.id} have been picked up/Received.`;
+            const text = `All items for Job Trip ${jobTrip.id} have been picked up/Received. Live Tracking of delivery will now commence.`;
             let message = await api.sendMessage({
                 chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-                text,
-                reply_to_message_id: message.message_id
+                text
             });
             message = await api.sendLocation({
                 chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
                 latitude: lat,
                 longitude: lng,
-                live_period: 86400
+                live_period: 86400,
+                reply_to_message_id: message.message_id
             });
             transporterGPSTracking.telegramMessageId = message.message_id;
         } catch(err) {
@@ -409,10 +409,14 @@ async function updateTransportLiveLocation(transporterGPSTracking) {
 async function stopTransportLiveLocation(transporterGPSTracking) {
     const {telegramMessageId} = transporterGPSTracking;
 
-    await api.stopMessageLiveLocation({
-        chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-        message_id: telegramMessageId
-    });
+    try {
+        await axios.post(`https://api.telegram.org/bot${keys.SIMPFLEET_TELEGRAM_BOT_TOKEN}/stopMessageLiveLocation`, {
+            chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+            message_id: telegramMessageId
+        });
+    } catch(err) {
+        console.log(err);
+    }
 }
 
 module.exports = {
