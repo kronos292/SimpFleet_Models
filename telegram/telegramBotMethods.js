@@ -356,35 +356,38 @@ async function sendErrorLogs(err) {
 
 // Send driver's live location to admin telegram chat.
 async function sendTransportLiveLocation(user, jobTrip) {
-    const transporterGPSTracking = new TransporterGPSTracking({
-        user,
-        jobTrip,
-        startDateTime: new Date()
-    });
+    let transporterGPSTracking = await TransporterGPSTracking.findOne({user: user._id, jobTrip: jobTrip._id}).select();
+    if(!transporterGPSTracking) {
+        transporterGPSTracking = new TransporterGPSTracking({
+            user,
+            jobTrip,
+            startDateTime: new Date()
+        });
 
-    const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
-    if(transporterGPSLocation) {
-        const {lat, lng} = transporterGPSLocation;
+        const transporterGPSLocation = await TransporterGPSLocation.findOne({user: user._id}).sort({timestamp: -1}).select();
+        if(transporterGPSLocation) {
+            const {lat, lng} = transporterGPSLocation;
 
-        try {
-            const text = `All items for Job Trip ${jobTrip.id} have been picked up/Received. Live Tracking of delivery will now commence.`;
-            let message = await api.sendMessage({
-                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-                text
-            });
-            message = await api.sendLocation({
-                chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
-                latitude: lat,
-                longitude: lng,
-                live_period: 86400,
-                reply_to_message_id: message.message_id
-            });
-            transporterGPSTracking.telegramMessageId = message.message_id;
-        } catch(err) {
-            console.log(err);
+            try {
+                const text = `All items for Job Trip ${jobTrip.id} have been picked up/Received. Live Tracking of delivery will now commence.`;
+                let message = await api.sendMessage({
+                    chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                    text
+                });
+                message = await api.sendLocation({
+                    chat_id: keys.SIMPFLEET_TRANSPORT_TRACKING_CHAT_ID,
+                    latitude: lat,
+                    longitude: lng,
+                    live_period: 86400,
+                    reply_to_message_id: message.message_id
+                });
+                transporterGPSTracking.telegramMessageId = message.message_id;
+            } catch(err) {
+                console.log(err);
+            }
         }
+        await transporterGPSTracking.save();
     }
-    await transporterGPSTracking.save();
 }
 
 // Update driver's live location to admin telegram chat.
