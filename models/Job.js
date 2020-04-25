@@ -40,7 +40,8 @@ const jobSchema = new Schema({
     telegramMessageId: {type: String, default: ""},
     estimatedJobPricingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobPricingBreakdowns'}],
     actualJobPricingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobPricingBreakdowns'}],
-    isDeleted: {type: Boolean, default: false} // For jobs that are accidentally created or for testing, and need to be removed from actual job count.
+    isDeleted: {type: Boolean, default: false}, // For jobs that are accidentally created or for testing, and need to be removed from actual job count.
+    status: {type: String, default: ""} // PENDING, APPROVED, NO_MATCH
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
