@@ -18,7 +18,8 @@ const schema = new Schema({
     resetPasswordToken: {type: String, default: ""},
     resetPasswordExpiry: {type: String, default: ""},
     company: {type: Schema.Types.ObjectId, ref: 'logisticsCompanies'},
-    resetPassword: {type:Object, default: {}}
+    resetPassword: {type:Object, default: {}},
+    expoPushNotification: {type: Object, ref: 'expoPushNotifications'}
 });
 
 // generating a hash
