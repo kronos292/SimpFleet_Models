@@ -41,7 +41,7 @@ const jobSchema = new Schema({
     estimatedJobPricingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobPricingBreakdowns'}],
     actualJobPricingBreakdowns: [{type: Schema.Types.ObjectId, ref: 'jobPricingBreakdowns'}],
     isDeleted: {type: Boolean, default: false}, // For jobs that are accidentally created or for testing, and need to be removed from actual job count.
-    status: {type: String, default: ""} // PENDING, APPROVED, NO_MATCH
+    status: {type: String, default: ""} // PENDING, APPROVED, NO_MATCH, CANCELLED
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
