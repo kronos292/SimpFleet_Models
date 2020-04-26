@@ -4,8 +4,9 @@ const { Schema } = mongoose;
 const schema = new Schema({
     job: {type: Schema.Types.ObjectId, ref: "jobs"},
     logisticsCompany: {type: Schema.Types.ObjectId, ref: "logisticsCompanies"},
-    notificationStatus: {type: String, default: ''}, // SENT, RECEIVED, OPENED
-    status: {type: String, default: ''} // PENDING, ACCEPTED, DECLINED
+    expoPushNotifications: [{type: Schema.Types.ObjectId, ref: "expoPushNotification"}],
+    status: {type: String, default: ''}, // PENDING, ACCEPTED, DECLINED, PASSED, ASSIGNED
+    declineRemarks: {type: String, default: ''} // Reason for declining job request.
 });
 
 module.exports = mongoose.model('jobRequests', schema);
