@@ -19,7 +19,7 @@ const schema = new Schema({
     resetPasswordExpiry: {type: String, default: ""},
     company: {type: Schema.Types.ObjectId, ref: 'logisticsCompanies'},
     resetPassword: {type:Object, default: {}},
-    expoPushNotificationTokens: [{type: Object, ref: 'expoPushNotificationTokens'}]
+    expoPushNotificationTokens: [{type: Schema.Types.ObjectId, ref: 'expoPushNotificationTokens'}]
 });
 
 // generating a hash
