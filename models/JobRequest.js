@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const schema = new Schema({
     job: {type: Schema.Types.ObjectId, ref: "jobs"},
     logisticsCompany: {type: Schema.Types.ObjectId, ref: "logisticsCompanies"},
-    expoPushNotifications: [{type: Schema.Types.ObjectId, ref: "expoPushNotification"}],
+    expoPushNotifications: [{type: Schema.Types.ObjectId, ref: "expoPushNotifications"}],
     status: {type: String, default: ''}, // PENDING, ACCEPTED, DECLINED, PASSED, ASSIGNED
     declineRemarks: {type: String, default: ''} // Reason for declining job request.
 });
