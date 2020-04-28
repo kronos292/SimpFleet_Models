@@ -26,6 +26,9 @@ const vesselSchema = new Schema({
     vesselShipManager: {type: String, default: ""},
     vesselRegisteredOwnership: {type: String, default: ""},
     vesselClassificationSociety: {type: String, default: ""},
+
+    // Last date & time updated.
+    dateTimeUpdated: {type: Date, default: null}
 });
 
 module.exports = mongoose.model('vessels', vesselSchema);
