@@ -26,6 +26,7 @@ const vesselSchema = new Schema({
     vesselShipManager: {type: String, default: ""},
     vesselRegisteredOwnership: {type: String, default: ""},
     vesselClassificationSociety: {type: String, default: ""},
+    arrivalDateTimeSG: {type: Date, default: null},
 
     // Last date & time updated.
     dateTimeUpdated: {type: Date, default: null}
