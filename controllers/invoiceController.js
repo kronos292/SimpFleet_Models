@@ -1,5 +1,5 @@
 const {Invoice} = require('../util/models');
-const s3Methods = require('../services/s3Methods');
+const s3Methods = require('../../../services/s3Methods');
 
 const keys = require('../config/keys');
 

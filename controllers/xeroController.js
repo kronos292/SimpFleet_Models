@@ -1,7 +1,7 @@
 const xero_node = require('xero-node');
 const {Invoice, Invoices, LineAmountTypes, CurrencyCode, Contacts} = require('xero-node');
 
-const keys = require('../config/keys');
+const keys = require('../../../config/keys');
 const {XeroAccessToken} = require('../util/models');
 const {companyAccountContactController, userCompanyController} = require('../util/controllers');
 

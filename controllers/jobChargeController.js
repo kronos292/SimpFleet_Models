@@ -1,5 +1,5 @@
 const {JobCharge, IdIndex} = require('../util/models');
-const telegramBotMethods = require('simpfleet_models/telegram/telegramBotMethods');
+const telegramBotMethods = require('../telegram/telegramBotMethods');
 
 async function find(findMethod, params) {
     return await JobCharge[findMethod](params).populate({
