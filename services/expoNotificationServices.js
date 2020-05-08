@@ -1,8 +1,7 @@
 const axios = require('axios');
 const moment = require('moment');
 
-const {LogisticsUser, LogisticsCompany, ExpoPushNotification} = require('../util/models');
-const {jobRequestController, jobAssignmentController} = require('../util/controllers');
+const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment} = require('../util/models');
 
 // Get expo tokens of all users in a logistics company.
 async function getExpoTokensOfLogisticsCompany(logisticsCompany) {
@@ -76,12 +75,13 @@ async function sendJobRequestNotifications(job) {
 
         // Send job requests only if expo tokens can be found.
         if(expoPushNotifications.length > 0) {
-            const jobRequest = await jobRequestController.create({
+            const jobRequest = new JobRequest({
                 job: job._id,
                 logisticsCompany: logisticsCompany._id,
                 expoPushNotifications,
                 status: 'PENDING'
             });
+            await jobRequest.save();
             jobRequests.push(jobRequest);
         }
     }
@@ -151,7 +151,32 @@ async function sendJobAssignmentNotifications(jobAssignment) {
 }
 
 async function sendJobDetailsUpdate(job) {
-    const jobAssignment = await jobAssignmentController.find('findOne', {job: job._id});
+    const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
+        path: "job",
+        model: "jobs",
+        populate: [
+            {
+                path: "user",
+                model: "users",
+                populate: {
+                    path: "userCompany",
+                    model: "userCompanies"
+                }
+            },
+            {
+                path: "vessel",
+                model: "vessels",
+            },
+            {
+                path: "vesselLoadingLocation",
+                model: "vesselLoadingLocations",
+            }
+        ]
+    }).populate({
+        path: "logisticsCompany",
+        model: "logisticsCompanies"
+    }).select();
+    
     if(jobAssignment) {
         const {logisticsCompany} = jobAssignment;
         if(logisticsCompany) {
