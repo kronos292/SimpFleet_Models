@@ -1,7 +1,7 @@
 const {Invoice} = require('../util/models');
 const s3Methods = require('../../../services/s3Methods');
 
-const keys = require('../config/keys');
+const keys = require('../../../config/keys');
 
 async function find(findMethod, params) {
     return await Invoice[findMethod](params).populate({
