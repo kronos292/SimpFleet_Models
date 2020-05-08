@@ -99,17 +99,16 @@ async function update(data) {
     if(jobRequest.status === 'PENDING' && data.status === 'ACCEPTED') {
         // If status is changed from pending to accepted, Check for acceptance by other 3PLs.
         // If no other 3PLs have accepted the job already, assign the job to this 3PL.
-        const jobAssignment = await JobAssignment.findOne('findOne', {
+        const jobAssignment = await JobAssignment.findOne({
             job: job._id
         }).populate({
             path: "logisticsCompany",
             model: "logisticsCompanies"
         }).select();
         if(jobAssignment && jobAssignment.status === 'Pending') {
-            const jobAssignment = await jobAssignmentController.update({
-                status: 'Assigned',
-                logisticsCompany: logisticsCompany._id
-            });
+            jobAssignment.status = 'Assigned';
+            jobAssignment.logisticsCompany = logisticsCompany._id;
+            await jobAssignment.save();
 
             // Send job assignment expo notification.
             await expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
