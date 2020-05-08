@@ -1,5 +1,4 @@
-const {JobRequest} = require('../util/models');
-const {jobAssignmentController} = require('../util/controllers');
+const {JobRequest, JobAssignment} = require('../util/models');
 const expoNotificationServices = require('../services/expoNotificationServices');
 
 async function find(findMethod, params) {
@@ -100,9 +99,12 @@ async function update(data) {
     if(jobRequest.status === 'PENDING' && data.status === 'ACCEPTED') {
         // If status is changed from pending to accepted, Check for acceptance by other 3PLs.
         // If no other 3PLs have accepted the job already, assign the job to this 3PL.
-        const jobAssignment = await jobAssignmentController.find('findOne', {
+        const jobAssignment = await JobAssignment.findOne('findOne', {
             job: job._id
-        });
+        }).populate({
+            path: "logisticsCompany",
+            model: "logisticsCompanies"
+        }).select();
         if(jobAssignment && jobAssignment.status === 'Pending') {
             const jobAssignment = await jobAssignmentController.update({
                 status: 'Assigned',
