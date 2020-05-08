@@ -102,6 +102,27 @@ async function update(data) {
         const jobAssignment = await JobAssignment.findOne({
             job: job._id
         }).populate({
+            path: "job",
+            model: "jobs",
+            populate: [
+                {
+                    path: "user",
+                    model: "users",
+                    populate: {
+                        path: "userCompany",
+                        model: "userCompanies"
+                    }
+                },
+                {
+                    path: "vessel",
+                    model: "vessels",
+                },
+                {
+                    path: "vesselLoadingLocation",
+                    model: "vesselLoadingLocations",
+                }
+            ]
+        }).populate({
             path: "logisticsCompany",
             model: "logisticsCompanies"
         }).select();
