@@ -1,6 +1,6 @@
 const {JobAssignment} = require('../util/models');
 
-// Function to find and populate job assignments.
+// Function to find and populate data.
 async function find(findMethod, params) {
     return await JobAssignment[findMethod](params).populate({
         path: "job",
@@ -29,4 +29,17 @@ async function find(findMethod, params) {
     }).select();
 }
 
-module.exports.find = find;
+// Function to find and update data.
+async function update(data) {
+    let jobAssignment = await find('findOne', {_id: data._id});
+    jobAssignment = {
+        ...data
+    }
+    await jobAssignment.save();
+    return jobAssignment;
+}
+
+module.exports = {
+    find,
+    update
+};
