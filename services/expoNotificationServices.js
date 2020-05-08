@@ -2,7 +2,8 @@ const axios = require('axios');
 const moment = require('moment');
 
 const {LogisticsUser, LogisticsCompany, ExpoPushNotification} = require('../util/models');
-const {jobRequestController, jobAssignmentController} = require('../util/controllers');
+const jobRequestController = require('../controllers/jobRequestController');
+const jobAssignmentController = require('../controllers/jobAssignmentController');
 
 // Get expo tokens of all users in a logistics company.
 async function getExpoTokensOfLogisticsCompany(logisticsCompany) {
