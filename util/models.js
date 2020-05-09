@@ -24,6 +24,7 @@ module.exports = {
     JobFile: require('../models/JobFile'),
     JobLink: require('../models/JobLink'),
     XeroAccessToken: require('../models/XeroAccessToken'),
+    VesselLoadingLocation: require('../models/VesselLoadingLocation'),
     Invoice: require('../models/accounts/Invoice'),
     JobCharge: require('../models/accounts/JobCharge'),
     JobPayment: require('../models/accounts/JobPayment'),
