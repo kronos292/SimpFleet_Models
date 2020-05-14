@@ -780,7 +780,7 @@ module.exports = {
                 const vessels = companyMap[key];
                 for(let i = 0; i < vessels.length; i++) {
                     const vessel = vessels[i];
-                    vesselString += `${vessel.vesselName} - ${moment(vessel.arrivalDateTimeSG).format('YYYY-MM:DD HH:mm:ss')}\n`;
+                    vesselString += `${vessel.vesselName} - ${moment(vessel.arrivalDateTimeSG).format('YYYY-MM-DD HH:mm:ss')}<br/>`;
                 }
 
                 // Get users from all companies.
@@ -795,7 +795,7 @@ module.exports = {
                     const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
                     const attachments = [];
                     const locals = {
-                        user: job.user,
+                        user,
                         vesselString
                     };
                     await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);

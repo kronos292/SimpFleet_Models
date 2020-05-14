@@ -9,7 +9,6 @@ body
         | Dear
         != ` ${user.firstName},`
         o:p
-    br
     p.MsoNormal
       span(style='font-family:"Arial",sans-serif')
         | We would like to notify you that the following vessels are arriving in Singapore soon:
@@ -19,11 +18,10 @@ body
         span(style='font-family:"Arial",sans-serif')
           != ` ${vesselString}`
           o:p
-    br
-      p.MsoNormal
-        span(style='font-family:"Arial",sans-serif')
-          | As your company has booked a delivery with us to these vessels previously, we are providing this convenient service to inform you of their return to Singapore. Please book a job with us at https://www.simpfleet.com if you would like our help to deliver your goods.
-          o:p
+    p.MsoNormal
+      span(style='font-family:"Arial",sans-serif')
+        | As your company has booked a delivery with us to these vessels previously, we are providing this convenient service to inform you of their return to Singapore. Please book a job with us at https://www.simpfleet.com if you would like our help to deliver your goods.
+        o:p
     p.MsoNormal
       span(style='font-family:"Arial",sans-serif')
         | Please feel free to email us at service@simpfleet.com if you have any queries.
