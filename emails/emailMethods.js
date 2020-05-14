@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 const path = require('path');
 
 const JobAssignment = require('../models/JobAssignment');
+const User = require('../models/User');
 
 const keys = require('../../../config/keys');
 
@@ -768,6 +769,38 @@ module.exports = {
                 psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
             };
             await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
+        }
+    },
+    sendUserVesselArrivalJobPrompt: async (companyMap) => {
+        // Iterate through companies.
+        for(const key in companyMap) {
+            if (companyMap.hasOwnProperty(key)) {
+                // Get vessel list and consolidate into a string.
+                let vesselString = '';
+                const vessels = companyMap[key];
+                for(let i = 0; i < vessels.length; i++) {
+                    const vessel = vessels[i];
+                    vesselString += `${vessel.vesselName} - ${moment(vessel.arrivalDateTimeSG).format('YYYY-MM:DD HH:mm:ss')}\n`;
+                }
+
+                // Get users from all companies.
+                const users = await User.find({userCompany: key}).select();
+                for(let i = 0; i < users.length; i++) {
+                    const user = users[i];
+
+                    // Send out email via template
+                    const templateName = 'vesselArrivalPromptToBookJob';
+                    const toEmail = user.email;
+                    const subject = `Vessel Arrival Alert`;
+                    const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+                    const attachments = [];
+                    const locals = {
+                        user: job.user,
+                        vesselString
+                    };
+                    await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
+                }
+            }
         }
     }
 };
