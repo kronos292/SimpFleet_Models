@@ -38,4 +38,6 @@ module.exports = {
     ExpoPushNotification: require('../models/notification/ExpoPushNotification'),
     ExpoPushNotificationToken: require('../models/notification/ExpoPushNotificationToken'),
     ProductSuite: require('../models/products/ProductSuite'),
+    OfflandDetail: require('../models/OfflandDetail'),
+    OfflandLocation: require('../models/OfflandLocation'),
 };
