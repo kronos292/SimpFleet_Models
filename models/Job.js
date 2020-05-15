@@ -28,6 +28,7 @@ const jobSchema = new Schema({
     hasBoarding: {type: Boolean, default: false},
     pickup: {type: Boolean, default: false},
     pickupDetails: [{type: Schema.Types.ObjectId, ref: 'pickupDetails'}],
+    offlandDetails: [{type: Schema.Types.ObjectId, ref: 'offlandDetails'}],
     vesselLighterName: {type: String, default: ''},
     vesselLighterLocation: {type: String, default: ''},
     vesselLighterRemarks: {type: String, default: ''},
