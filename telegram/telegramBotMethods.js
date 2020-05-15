@@ -437,8 +437,22 @@ async function stopTransportLiveLocation(transporterGPSTracking) {
 
 async function sendJobProgressReport() {
     const dateNow = new Date();
-    const jobs = await Job.find({jobBookingDateTime: {"$gte": moment(dateNow).subtract(6, 'days'), "$lt": dateNow}}).select();
-    console.log(jobs);
+    const weekJobs = await Job.find({jobBookingDateTime: {"$gte": moment(dateNow).subtract(6, 'days'), "$lt": dateNow}}).select();
+    const lastWeekJobs = await Job.find({jobBookingDateTime: {"$gte": moment(dateNow).subtract(13, 'days'), "$lt": moment(dateNow).subtract(7, 'days')}}).select();
+
+    const monthJobs = await Job.find({jobBookingDateTime: {"$gte": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 1)), "$lt": moment(dateNow)}}).select();
+    const lastMonthJobs = await Job.find({jobBookingDateTime: {"$gte": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 1)).subtract(1, 'month'), "$lt": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 31)).subtract(1, 'month')}}).select();
+
+    let text = `No. of jobs this week: ${weekJobs.length}\n`
+     + `Compared to last week, ${weekJobs.length - lastWeekJobs.length > 0? 'increase': 'decrease'} by: ${weekJobs.length - lastWeekJobs.length}\n`
+     + `\n`
+    + `No. of jobs so far this month: ${monthJobs.length}\n`
+    + `Compared to last month, ${monthJobs.length - lastMonthJobs.length > 0? 'increase': 'decrease'} by: ${monthJobs.length - lastMonthJobs.length}\n`;
+
+    await api.sendMessage({
+        chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
+        text
+    });
 }
 
 module.exports = {
