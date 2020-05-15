@@ -13,6 +13,7 @@ const PSAVessel = require('../models/PSAVessel');
 const Invoice = require('../models/accounts/Invoice');
 const TransporterGPSLocation = require('../models/TransporterGPSLocation');
 const TransporterGPSTracking = require('../models/TransporterGPSTracking');
+const Job = require('../models/Job');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
@@ -434,6 +435,12 @@ async function stopTransportLiveLocation(transporterGPSTracking) {
     }
 }
 
+async function sendJobProgressReport() {
+    const dateNow = new Date();
+    const jobs = await Job.find({jobBookingDateTime: {"$gte": moment(dateNow).subtract(6, 'days'), "$lt": dateNow}}).select();
+    console.log(jobs);
+}
+
 module.exports = {
     sendJobBookingInfo: async (job) => {
         const jobDetails = await formJobMessage(job, "Create");
@@ -517,5 +524,6 @@ module.exports = {
     sendInvoiceFile,
     sendTransportLiveLocation,
     updateTransportLiveLocation,
-    stopTransportLiveLocation
+    stopTransportLiveLocation,
+    sendJobProgressReport
 };
