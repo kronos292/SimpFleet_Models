@@ -443,7 +443,8 @@ async function sendJobProgressReport() {
     const monthJobs = await Job.find({jobBookingDateTime: {"$gte": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 1)), "$lt": moment(dateNow)}}).select();
     const lastMonthJobs = await Job.find({jobBookingDateTime: {"$gte": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 1)).subtract(1, 'month'), "$lt": moment(new Date(dateNow.getFullYear(), dateNow.getMonth(), 31)).subtract(1, 'month')}}).select();
 
-    let text = `No. of jobs this week: ${weekJobs.length}\n`
+    let text = `Job progress update:\n\n`
+    + `No. of jobs this week: ${weekJobs.length}\n`
      + `Compared to last week, ${weekJobs.length - lastWeekJobs.length > 0? 'increase': 'decrease'} by: ${weekJobs.length - lastWeekJobs.length}\n`
      + `\n`
     + `No. of jobs so far this month: ${monthJobs.length}\n`
