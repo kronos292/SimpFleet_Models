@@ -94,8 +94,9 @@ async function sendJobRequestNotifications(job) {
 
             // Set notification details.
             const title = `New Job Request`;
-            let {pickupDetails, index, vesselLoadingLocation} = job;
-            let body = `New job ${index}. Delivery to ${vesselLoadingLocation.name}.`;
+            let {pickupDetails, index, vesselLoadingLocation, otherVesselLoadingLocation} = job;
+            const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
+            let body = `New job ${index}. Delivery to ${vesselLoadingLocationName}.`;
             if(pickupDetails.length > 0) {
                 pickupDetails = pickupDetails.sort((a, b) => {
                     return a.pickupDateTime - b.pickupDateTime;
@@ -129,8 +130,9 @@ async function sendJobAssignmentNotifications(jobAssignment) {
 
             // Set notification details.
             const title = 'New Job Assigned';
-            let {pickupDetails, index, vesselLoadingLocation} = job;
-            let body = `New job ${index} has been assigned to you. Delivery to ${vesselLoadingLocation.name}.`;
+            let {pickupDetails, index, vesselLoadingLocation, otherVesselLoadingLocation} = job;
+            const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
+            let body = `New job ${index} has been assigned to you. Delivery to ${vesselLoadingLocationName}.`;
             if(pickupDetails.length > 0) {
                 pickupDetails = pickupDetails.sort((a, b) => {
                     return a.pickupDateTime - b.pickupDateTime;
