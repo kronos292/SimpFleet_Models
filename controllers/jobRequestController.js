@@ -126,13 +126,21 @@ async function update(data) {
             path: "logisticsCompany",
             model: "logisticsCompanies"
         }).select();
-        if(jobAssignment && jobAssignment.status === 'Pending') {
-            jobAssignment.status = 'Assigned';
-            jobAssignment.logisticsCompany = logisticsCompany._id;
-            await jobAssignment.save();
+        if(jobAssignment) {
+            if(jobAssignment.status === 'Pending') {
+                jobAssignment.status = 'Assigned';
+                jobAssignment.logisticsCompany = logisticsCompany._id;
+                await jobAssignment.save();
 
-            // Send job assignment expo notification.
-            await expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
+                // Send job assignment expo notification.
+                await expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
+            } else if(jobAssignment.status === 'Assigned') {
+                const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
+                for(let i = 0; i < jobRequests.length; i++) {
+                    jobRequests[i].status = 'PASSED';
+                    await jobRequests[i].save();
+                }
+            }
         }
     }
 
