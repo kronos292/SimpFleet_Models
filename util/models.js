@@ -40,4 +40,5 @@ module.exports = {
     ProductSuite: require('../models/products/ProductSuite'),
     OfflandDetail: require('../models/OfflandDetail'),
     OfflandLocation: require('../models/OfflandLocation'),
+    JobStatus: require('../models/JobStatus'),
 };
