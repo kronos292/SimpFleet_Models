@@ -18,4 +18,5 @@ module.exports = {
     jobPaymentController: require('../controllers/jobPaymentController'),
     jobRequestController: require('../controllers/jobRequestController'),
     productSuiteController: require('../controllers/productSuiteController'),
+    jobTrackerController: require('../controllers/jobTrackerController'),
 };
