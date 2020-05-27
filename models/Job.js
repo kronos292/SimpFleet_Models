@@ -16,6 +16,7 @@ const jobSchema = new Schema({
     jobBookingDateTime: {type: Date, default: new Date()},
     vesselArrivalDateTime: {type: Date, default: null},
     remarks: {type: String, default: ''},
+    adminRemarks: {type: String, default: ''}, // Remarks only input and seen by the admin accounts.
     vesselLoadingDateTime: {type: Date, default: null},
     psaBerthingDateTime: {type: Date, default: null},
     psaUnberthingDateTime: {type: Date, default: null},
