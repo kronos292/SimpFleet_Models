@@ -3,6 +3,35 @@ const moment = require('moment');
 
 const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment} = require('../util/models');
 
+// Get job assignment from job id.
+async function getJobAssignment(job) {
+    return await JobAssignment.findOne({job: job._id}).populate({
+        path: "job",
+        model: "jobs",
+        populate: [
+            {
+                path: "user",
+                model: "users",
+                populate: {
+                    path: "userCompany",
+                    model: "userCompanies"
+                }
+            },
+            {
+                path: "vessel",
+                model: "vessels",
+            },
+            {
+                path: "vesselLoadingLocation",
+                model: "vesselLoadingLocations",
+            }
+        ]
+    }).populate({
+        path: "logisticsCompany",
+        model: "logisticsCompanies"
+    }).select();
+}
+
 // Get expo tokens of all users in a logistics company.
 async function getExpoTokensOfLogisticsCompany(logisticsCompany) {
     // Get logistics users of the company. Check if they have Expo push notifications.
@@ -153,31 +182,7 @@ async function sendJobAssignmentNotifications(jobAssignment) {
 }
 
 async function sendJobDetailsUpdate(job) {
-    const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
-        path: "job",
-        model: "jobs",
-        populate: [
-            {
-                path: "user",
-                model: "users",
-                populate: {
-                    path: "userCompany",
-                    model: "userCompanies"
-                }
-            },
-            {
-                path: "vessel",
-                model: "vessels",
-            },
-            {
-                path: "vesselLoadingLocation",
-                model: "vesselLoadingLocations",
-            }
-        ]
-    }).populate({
-        path: "logisticsCompany",
-        model: "logisticsCompanies"
-    }).select();
+    const jobAssignment = await getJobAssignment(job);
     
     if(jobAssignment) {
         const {logisticsCompany} = jobAssignment;
@@ -201,8 +206,34 @@ async function sendJobDetailsUpdate(job) {
     }
 }
 
+async function sendPSAJobBerthUpdate(job) {
+    const jobAssignment = await getJobAssignment(job);
+
+    if(jobAssignment) {
+        const {logisticsCompany} = jobAssignment;
+        if(logisticsCompany) {
+            // Get logistics users of the company. Check if they have Expo push notifications.
+            const expoPushNotifications = await getExpoTokensOfLogisticsCompany(logisticsCompany);
+
+            // Send only if expo tokens can be found.
+            if(expoPushNotifications.length > 0) {
+                // Set notification details.
+                const title = 'Vessel Berthing details Updated';
+                const body = `Vessel Berthing Details for ${job.index} has been updated.`;
+
+                // Send out expo notifications.
+                await sendExpoNotifications(expoPushNotifications, title, body, {
+                    jobId: job._id,
+                    type: 'JOB_UPDATE'
+                });
+            }
+        }
+    }
+}
+
 module.exports = {
     sendJobRequestNotifications,
     sendJobAssignmentNotifications,
-    sendJobDetailsUpdate
+    sendJobDetailsUpdate,
+    sendPSAJobBerthUpdate
 }
