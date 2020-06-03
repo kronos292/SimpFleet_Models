@@ -31,6 +31,7 @@ const jobSchema = new Schema({
     offlandDetails: [{type: Schema.Types.ObjectId, ref: 'offlandDetails'}],
     vesselLighterName: {type: String, default: ''},
     vesselLighterLocation: {type: String, default: ''},
+    vesselLighterCompany: {type: String, default: ''},
     vesselLighterRemarks: {type: String, default: ''},
     jobTrip: {type: Schema.Types.ObjectId, ref: 'jobTrips'},
     psaQuayCraneSequences: [{type: Schema.Types.ObjectId, ref: 'psaQuayCraneSequences'}],
