@@ -91,6 +91,9 @@ async function formJobMessage(job, status) {
         if (job.vesselLighterName !== "") {
             messageString += `Vessel Lighter Name: ${job.vesselLighterName}\n`;
         }
+        if (job.vesselLighterCompany && job.vesselLighterCompany !== "") {
+            messageString += `Vessel Lighter Company: ${job.vesselLighterCompany}\n`;
+        }
         if (job.vesselLighterRemarks !== "") {
             messageString += `Vessel Lighter Remarks: ${job.vesselLighterRemarks}\n`;
         }
