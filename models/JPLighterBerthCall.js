@@ -8,7 +8,8 @@ const schema = new Schema({
     crane: {type: String, default: ''},
     arrivalDateTime: {type: Date, default: null},
     departureDateTime: {type: Date, default: null},
-    terminal: {type: String, default: ''}
+    terminal: {type: String, default: ''},
+    lighterBoat: {type: Schema.Types.ObjectId, ref: 'lighterBoats'}
 });
 
 module.exports = mongoose.model('jpLighterBerthCalls', schema);
