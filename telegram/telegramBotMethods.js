@@ -42,8 +42,7 @@ async function formJobMessage(job, status) {
     const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
     const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
-
-
+    
     const items = job.jobItems;
     let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
     for (let i = 1; i < items.length; i++) {
@@ -76,7 +75,7 @@ async function formJobMessage(job, status) {
         messageString += `Items to Offland: ${jobOfflandItemString}\n`;
     }
     if (job.vesselLoadingLocation.type === 'port') {
-        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
+        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.psaBerf !== '') {
             messageString += `Berth: ${job.psaBerf}\n`;
         }
@@ -87,7 +86,7 @@ async function formJobMessage(job, status) {
             messageString += `Vessel Estimated Unberthing Time: ${psaUnberthingDateTime}\n`;
         }
     } else if (job.vesselLoadingLocation.type === 'anchorage') {
-        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
+        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.vesselLighterName !== "") {
             messageString += `Vessel Lighter Name: ${job.vesselLighterName}\n`;
         }
@@ -101,14 +100,14 @@ async function formJobMessage(job, status) {
             messageString += `Lighter Loading Date & Time: ${vesselLoadingDateTime}\n`;
         }
     } else if (job.vesselLoadingLocation.type === 'others') {
-        messageString += `Vessel Loading Location: ${job.otherVesselLoadingLocation}\n`;
+        messageString += `Delivery Location: ${job.otherVesselLoadingLocation}\n`;
         if (job.vesselLoadingDateTime !== "") {
-            messageString += `Vessel Loading Date & Time: ${vesselLoadingDateTime}\n`;
+            messageString += `Delivery Date & Time: ${vesselLoadingDateTime}\n`;
         }
     } else {
-        messageString += `Vessel Loading Location: ${job.vesselLoadingLocation.name}\n`;
+        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
         if (job.vesselLoadingDateTime !== "") {
-            messageString += `Vessel Loading Date & Time: ${vesselLoadingDateTime}\n`;
+            messageString += `Delivery Date & Time: ${vesselLoadingDateTime}\n`;
         }
     }
     if (job.createDSA) {
