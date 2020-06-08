@@ -41,7 +41,7 @@ async function formJobMessage(job, notificationArr, status) {
     for(let i = 0; i < notificationArr.length; i++) {
         const notification = notificationArr[i];
         const {key, value} = notification;
-        messageString += `${key}: ${value}`;
+        messageString += `${key}: ${value}\n`;
     }
 
     return messageString;
