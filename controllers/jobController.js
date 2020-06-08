@@ -1,4 +1,10 @@
+const moment = require('moment');
+
 const {Job, UserCompany} = require('../util/models');
+
+async function dateTimeFormatter(date) {
+    return moment.tz(date, "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+}
 
 async function find(findMethod, params) {
     return await Job[findMethod](params).populate({
