@@ -34,106 +34,16 @@ async function qcDateTimeParser(dateTimeString) {
     return new Date(`${year}-${month}-${day} ${hour}:${minutes}:${seconds} GMT+08:00`);
 }
 
-async function formJobMessage(job, status) {
+async function formJobMessage(job, notificationArr, status) {
     const heading = status === "Update" ? 'Job Update' : 'New job';
 
-    const vessel = job.vessel;
-
-    const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
-    const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
-    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
-    
-    const items = job.jobItems;
-    let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
-    for (let i = 1; i < items.length; i++) {
-        const item = items[i];
-        itemString += `, ${item.quantity} ${item.uom}`
-    }
-
-    const jobOfflandItems = job.jobOfflandItems;
-    let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
-    for (let i = 1; i < jobOfflandItems.length; i++) {
-        const jobOfflandItem = jobOfflandItems[i];
-        jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
-    }
-
-    const userCompany = await UserCompany.findOne({_id: job.user.userCompany}).select();
-
     let messageString = `${heading} for ${job.index}: \n\n`;
-    messageString += `Job ID: ${job.index}\n`;
-    messageString += `Job Number: ${job.jobId}\n`;
-    if (userCompany !== null) {
-        messageString += `Company: ${userCompany.name}\n`;
+    for(let i = 0; i < notificationArr.length; i++) {
+        const notification = notificationArr[i];
+        const {key, value} = notification;
+        messageString += `${key}: ${value}`;
     }
-    if (vessel !== null) {
-        messageString += `Vessel Name: ${vessel.vesselName}\n`;
-        messageString += `Vessel IMO: ${vessel.vesselIMOID}\n`;
-        messageString += `Vessel Callsign: ${vessel.vesselCallsign}\n`;
-    }
-    messageString += `Items to Deliver: ${itemString}\n`;
-    if (jobOfflandItemString !== "") {
-        messageString += `Items to Offland: ${jobOfflandItemString}\n`;
-    }
-    if (job.vesselLoadingLocation.type === 'port') {
-        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
-        if (job.psaBerf !== '') {
-            messageString += `Berth: ${job.psaBerf}\n`;
-        }
-        if (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) {
-            messageString += `Vessel Estimated Berthing Time: ${psaBerthingDateTime}\n`;
-        }
-        if (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) {
-            messageString += `Vessel Estimated Unberthing Time: ${psaUnberthingDateTime}\n`;
-        }
-    } else if (job.vesselLoadingLocation.type === 'anchorage') {
-        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
-        if (job.vesselLighterName !== "") {
-            messageString += `Vessel Lighter Name: ${job.vesselLighterName}\n`;
-        }
-        if (job.vesselLighterCompany && job.vesselLighterCompany !== "") {
-            messageString += `Vessel Lighter Company: ${job.vesselLighterCompany}\n`;
-        }
-        if (job.vesselLighterRemarks !== "") {
-            messageString += `Vessel Lighter Remarks: ${job.vesselLighterRemarks}\n`;
-        }
-        if (job.vesselLoadingDateTime !== "") {
-            messageString += `Lighter Loading Date & Time: ${vesselLoadingDateTime}\n`;
-        }
-    } else if (job.vesselLoadingLocation.type === 'others') {
-        messageString += `Delivery Location: ${job.otherVesselLoadingLocation}\n`;
-        if (job.vesselLoadingDateTime !== "") {
-            messageString += `Delivery Date & Time: ${vesselLoadingDateTime}\n`;
-        }
-    } else {
-        messageString += `Delivery Location: ${job.vesselLoadingLocation.name}\n`;
-        if (job.vesselLoadingDateTime !== "") {
-            messageString += `Delivery Date & Time: ${vesselLoadingDateTime}\n`;
-        }
-    }
-    if (job.createDSA) {
-        messageString += `A DSA is to be created for the Job Items.\n`;
-    }
-    if (job.hasBoarding) {
-        messageString += `\nBoarding Officer will be provided for this job.\n`;
-    } else {
-        messageString += `\nThere will be no Boarding Officer for this job.\n`;
-    }
-    messageString += '\n';
-    if (job.pickup) {
-        messageString += `Pick up from the following locations:\n`;
-        for (let i = 0; i < job.pickupDetails.length; i++) {
-            const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
-            messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
-        }
-    }
-    messageString += '\n';
-    if (job.remarks !== "") {
-        messageString += `Remarks:\n`;
-        const remarksArray = job.remarks.split("\n");
-        for (let i = 0; i < remarksArray.length; i++) {
-            messageString += `${remarksArray[i]}\n`;
-        }
-    }
+
     return messageString;
 }
 
@@ -215,8 +125,8 @@ async function sendLocation(job, message) {
     }
 }
 
-async function sendAdminJobBookingInfo(job) {
-    const jobDetails = await formJobMessage(job, "Create");
+async function sendAdminJobBookingInfo(job, notificationArr) {
+    const jobDetails = await formJobMessage(job, notificationArr, "Create");
 
     try {
         const keyboardButtons = [];
@@ -245,8 +155,8 @@ async function sendAdminJobBookingInfo(job) {
     }
 }
 
-async function sendAdminJobUpdateInfo(job) {
-    const jobDetails = await formJobMessage(job, "Update");
+async function sendAdminJobUpdateInfo(job, notificationArr) {
+    const jobDetails = await formJobMessage(job, notificationArr,"Update");
 
     try {
         const message = await api.sendMessage({
@@ -459,8 +369,8 @@ async function sendJobProgressReport() {
 }
 
 module.exports = {
-    sendJobBookingInfo: async (job) => {
-        const jobDetails = await formJobMessage(job, "Create");
+    sendJobBookingInfo: async (job, notificationArr) => {
+        const jobDetails = await formJobMessage(job, notificationArr, "Create");
 
         // Get job assignment and logistics company
         const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
@@ -494,8 +404,8 @@ module.exports = {
             console.log(err);
         }
     },
-    sendJobBookingUpdateInfo: async (job) => {
-        const jobDetails = await formJobMessage(job, "Update");
+    sendJobBookingUpdateInfo: async (job, notificationArr) => {
+        const jobDetails = await formJobMessage(job, notificationArr, "Update");
 
         // Get job assignment and logistics company
         const jobAssignment = await JobAssignment.findOne({job: job._id}).populate({
