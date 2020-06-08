@@ -273,7 +273,6 @@ async function buildJobNotification(job) {
             const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
             messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
         }
-		messageString += '\n';
         notifications.push(
             {
                 key: 'Pick up from the following locations',
@@ -289,7 +288,6 @@ async function buildJobNotification(job) {
         for (let i = 0; i < remarksArray.length; i++) {
             messageString += `${remarksArray[i]}\n`;
         }
-		messageString += '\n';
 
         notifications.push(
             {
