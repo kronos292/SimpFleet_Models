@@ -268,11 +268,12 @@ async function buildJobNotification(job) {
 
     // Job pickup.
     if (job.pickupDetails.length > 0) {
-        let messageString = '';
+        let messageString = '\n';
         for (let i = 0; i < job.pickupDetails.length; i++) {
             const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
             messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
         }
+		messageString += '\n';
         notifications.push(
             {
                 key: 'Pick up from the following locations',
@@ -284,10 +285,11 @@ async function buildJobNotification(job) {
     // Remarks.
     if (job.remarks && job.remarks !== "") {
         const remarksArray = job.remarks.split("\n");
-        let messageString = '';
+        let messageString = '\n';
         for (let i = 0; i < remarksArray.length; i++) {
             messageString += `${remarksArray[i]}\n`;
         }
+		messageString += '\n';
 
         notifications.push(
             {
