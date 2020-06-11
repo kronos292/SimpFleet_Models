@@ -40,6 +40,15 @@ async function find(findMethod, params) {
             }
         ]
     }).populate({
+        path: 'offlandDetails',
+        model: 'offlandDetails',
+        populate: [
+            {
+                path: 'offlandLocation',
+                model: 'offlandLocations'
+            }
+        ]
+    }).populate({
         path: 'careOffParties',
         model: 'careOffParties',
         populate: [
