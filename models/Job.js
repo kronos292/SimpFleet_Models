@@ -25,6 +25,7 @@ const jobSchema = new Schema({
     cancellationRemarks: {type: String, default: ''},
     isArchived: {type: Boolean, default: false},
     createDSA: {type: Boolean, default: false},
+    createOfflandPermit: {type: Boolean, default: false},
     hasBoarding: {type: Boolean, default: false},
     pickup: {type: Boolean, default: false},
     pickupDetails: [{type: Schema.Types.ObjectId, ref: 'pickupDetails'}],

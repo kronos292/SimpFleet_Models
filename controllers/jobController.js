@@ -261,7 +261,17 @@ async function buildJobNotification(job) {
     if (job.createDSA) {
         notifications.push(
             {
-                key: 'Create DSA',
+                key: 'Create DSA/SSN',
+                value: 'Yes'
+            }
+        );
+    }
+
+    // DSA creation.
+    if (job.createOfflandPermit) {
+        notifications.push(
+            {
+                key: 'Create Offland Permit',
                 value: 'Yes'
             }
         );
