@@ -274,6 +274,22 @@ async function buildJobNotification(job) {
             value: job.hasBoarding? 'Boarding Officer will be provided for this job.': 'There will be no Boarding Officer for this job.'
         }
     );
+    if(job.hasBoarding && job.boardingName !== '') {
+        notifications.push(
+            {
+                key: 'Boarding Officer Name',
+                value: job.boardingName
+            }
+        );
+    }
+    if(job.hasBoarding && job.boardingContact !== '') {
+        notifications.push(
+            {
+                key: 'Boarding Officer Contact',
+                value: job.boardingContact
+            }
+        );
+    }
 
     // Job pickup.
     if (job.pickupDetails.length > 0) {
