@@ -1,4 +1,4 @@
-const {JobTrip} = require('../util/models');
+const {JobTrip, TransportUser} = require('../util/models');
 
 async function find(findMethod, params) {
     return await JobTrip[findMethod](params).populate({

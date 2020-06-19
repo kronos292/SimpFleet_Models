@@ -41,6 +41,7 @@ module.exports = {
     OfflandDetail: require('../models/OfflandDetail'),
     OfflandLocation: require('../models/OfflandLocation'),
     JobStatus: require('../models/JobStatus'),
+    TransportUser: require('../models/TransportUser'),
     LighterBoatCompany: require('../models/lighters/LighterBoatCompany'),
     LighterBoat: require('../models/lighters/LighterBoat'),
 };
