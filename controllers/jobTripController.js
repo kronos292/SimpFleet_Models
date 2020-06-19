@@ -49,6 +49,9 @@ async function find(findMethod, params) {
         path: 'vehicle',
         model: 'vehicles'
     }).populate({
+        path: 'driver',
+        model: 'transportUsers'
+    }).populate({
         path: 'estimatedJobCostingBreakdowns',
         model: 'jobCostingBreakdowns'
     }).select();
