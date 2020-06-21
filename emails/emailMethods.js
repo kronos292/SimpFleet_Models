@@ -53,6 +53,7 @@ module.exports = {
         const mailOptions = {
             from: keys.SHIP_SUPPLIES_DIRECT_SALES_EMAIL,
             to: email,
+            cc: [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL],
             subject: subject,
             html: htmlText,
             attachments
