@@ -9,6 +9,13 @@ async function find(findMethod, params) {
             path: 'productSuites',
             model: 'productSuites'
         }
+    }).populate({
+        path: 'creditWallet',
+        model: 'creditWallets',
+        populate: {
+            path: 'creditLogs',
+            model: 'creditLogs'
+        }
     }).select();
 }
 

@@ -18,7 +18,8 @@ const schema = new Schema({
     resetPasswordToken: {type: String, default: ""},
     resetPasswordExpiry: {type: String, default: ""},
     pickupLocations: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}],
-    userCompany: {type: Schema.Types.ObjectId, ref: 'userCompanies'}
+    userCompany: {type: Schema.Types.ObjectId, ref: 'userCompanies'},
+    creditWallet: {type: Schema.Types.ObjectId, ref: 'creditWallets'},
 });
 
 // generating a hash
