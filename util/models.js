@@ -44,4 +44,6 @@ module.exports = {
     TransportUser: require('../models/TransportUser'),
     LighterBoatCompany: require('../models/lighters/LighterBoatCompany'),
     LighterBoat: require('../models/lighters/LighterBoat'),
+    CreditWallet: require('../models/credits/CreditWallet'),
+    CreditLog: require('../models/credits/CreditLog'),
 };
