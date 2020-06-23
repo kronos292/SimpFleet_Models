@@ -69,6 +69,9 @@ async function find(findMethod, params) {
     }).populate({
         path: 'estimatedJobPricingBreakdowns',
         model: 'jobPricingBreakdowns'
+    }).populate({
+        path: 'vesselAnchorageLocation',
+        model: 'sgAnchorageLocations'
     }).select();
 }
 
@@ -193,6 +196,18 @@ async function buildJobNotification(job) {
                 value: job.vesselLoadingLocation.name
             }
         );
+        if(job.vesselAnchorageLocation) {
+            notifications.push(
+                {
+                    key: 'Anchorage Name',
+                    value: job.vesselAnchorageLocation.name
+                },
+                {
+                    key: 'Anchorage Code',
+                    value: job.vesselAnchorageLocation.code
+                }
+            );
+        }
         if (job.vesselLighterName !== "") {
             notifications.push(
                 {
