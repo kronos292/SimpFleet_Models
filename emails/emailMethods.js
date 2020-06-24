@@ -548,10 +548,13 @@ module.exports = {
             model: 'logisticsCompanies'
         }).select();
 
+        // Get vessel
+        const {vessel} = job;
+
         // Send out email via template
         const templateName = 'jobFileUploadLogistics';
         const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
-        const subject = `New document submitted for job ${job.jobId}`;
+        const subject = `New document submitted for job ${job.jobId}${vessel? ` - ${vessel.vesselName}`: ''}`;
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
         const attachments = [
             {
