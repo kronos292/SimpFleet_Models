@@ -109,6 +109,23 @@ async function buildJobNotification(job) {
         }
     ];
 
+    // Services Required.
+    const services = [];
+    if(job.makeTruckBooking) {
+        services.push('Truck Booking');
+    }
+    if(job.makeLighterBooking) {
+        services.push('Lighter Booking');
+    }
+    if(services.length > 0) {
+        notifications.push(
+            {
+                key: 'Services Required',
+                value: services.toString()
+            }
+        );
+    }
+
     // User Company
     if(userCompany) {
         notifications.push(
