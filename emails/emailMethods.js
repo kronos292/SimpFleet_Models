@@ -554,7 +554,7 @@ module.exports = {
         // Send out email via template
         const templateName = 'jobFileUploadLogistics';
         const toEmail = jobAssignment.logisticsCompany.correspondenceEmails;
-        const subject = `New document submitted for job ${job.jobId}${vessel? ` - ${vessel.vesselName}`: ''}`;
+        const subject = `New document submitted for job ${job.index}${vessel? ` - ${vessel.vesselName}`: ''}`;
         const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
         const attachments = [
             {
