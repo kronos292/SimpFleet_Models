@@ -306,6 +306,18 @@ module.exports = {
         };
         await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     },
+    sendLighterUserSignUpConfirmationEmail: async (user) => {
+        // Send out email via template
+        const templateName = 'lighterUserSignUpConfirmation';
+        const toEmail = user.email;
+        const subject = `SGlighters - Sign Up Confirmed`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
+    },
     sendUserJobConfirmationEmail: async (job) => {
         const items = job.jobItems;
         let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
