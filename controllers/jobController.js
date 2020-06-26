@@ -116,7 +116,7 @@ async function buildJobNotification(job) {
             {
                 key: 'Services Required',
                 value: services.map((service, index) => {
-                    `${service.label}, `
+                    return `${service.label}, `
                 })
             }
         );
