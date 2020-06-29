@@ -368,6 +368,17 @@ async function sendJobProgressReport() {
     });
 }
 
+async function sendDriverAssignmentNotification(jobTrip) {
+    const {driver} = jobTrip;
+
+    const text = `${driver.firstName} ${driver.lastName} has been assigned to Job Trip ${jobTrip.id}.`;
+
+    await api.sendMessage({
+        chat_id: keys.SIMPFLEET_TELEGRAM_BROADCAST_CHAT_ID,
+        text
+    });
+}
+
 module.exports = {
     sendJobBookingInfo: async (job, notificationArr) => {
         const jobDetails = await formJobMessage(job, notificationArr, "Create");
@@ -452,5 +463,6 @@ module.exports = {
     sendTransportLiveLocation,
     updateTransportLiveLocation,
     stopTransportLiveLocation,
-    sendJobProgressReport
+    sendJobProgressReport,
+    sendDriverAssignmentNotification
 };
