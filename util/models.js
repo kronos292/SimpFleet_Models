@@ -47,4 +47,7 @@ module.exports = {
     CreditWallet: require('../models/credits/CreditWallet'),
     CreditLog: require('../models/credits/CreditLog'),
     SGAnchorageLocation: require('../models/anchorages/SGAnchorageLocation'),
+    LogisticsService: require('../models/LogisticsService'),
+    LighterCaptain: require('../models/LighterCaptain'),
+    LighterOperator: require('../models/LighterOperator'),
 };
