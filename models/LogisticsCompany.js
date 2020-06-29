@@ -9,7 +9,7 @@ const schema = new Schema({
     correspondenceEmails: [{type: String, default: ""}],
     trucks: [{type: Schema.Types.ObjectId, ref: 'trucks'}],
     productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}],
-    logisticsServices: [{type: Schema.Types.ObjectId, default: 'logisticsServices'}] // Services the 3PL is able to provide.
+    logisticsServices: [{type: Schema.Types.ObjectId, ref: 'logisticsServices'}] // Services the 3PL is able to provide.
 });
 
 module.exports = mongoose.model('logisticsCompanies', schema);
