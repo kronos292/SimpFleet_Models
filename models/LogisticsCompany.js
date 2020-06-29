@@ -8,7 +8,8 @@ const schema = new Schema({
     telegramGroupChatId: {type: String, default: ""},
     correspondenceEmails: [{type: String, default: ""}],
     trucks: [{type: Schema.Types.ObjectId, ref: 'trucks'}],
-    productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}]
+    productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}],
+    services: [{type: String, default: ""}] // TYPE_TRUCK, TYPE_BOAT
 });
 
 module.exports = mongoose.model('logisticsCompanies', schema);
