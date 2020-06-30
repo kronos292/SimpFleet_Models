@@ -1,11 +1,12 @@
 const axios = require('axios');
 const moment = require('moment');
+const _ = require('lodash');
 
 const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment} = require('../util/models');
 
 // Get job assignment from job id.
-async function getJobAssignment(job) {
-    return await JobAssignment.findOne({job: job._id}).populate({
+async function getJobAssignments(job) {
+    return await JobAssignment.find({job: job._id}).populate({
         path: "job",
         model: "jobs",
         populate: [
@@ -29,6 +30,9 @@ async function getJobAssignment(job) {
     }).populate({
         path: "logisticsCompany",
         model: "logisticsCompanies"
+    }).populate({
+        path: "logisticsService",
+        model: "logisticsServices"
     }).select();
 }
 
@@ -93,25 +97,51 @@ async function sendExpoNotifications(expoPushNotifications, title, body, data) {
 
 async function sendJobRequestNotifications(job) {
     // Get Logistics companies and get all expo tokens.
-    const logisticsCompanies = await LogisticsCompany.find().select();
+    const logisticsCompanies = await LogisticsCompany.find().populate({
+        path: "logisticsServices",
+        model: "logisticsServices"
+    }).select();
+
+    const {makeTruckBooking, makeLighterBooking} = job;
 
     const jobRequests = [];
     for(let i = 0; i < logisticsCompanies.length; i++) {
         const logisticsCompany = logisticsCompanies[i];
+        const {logisticsServices} = logisticsCompany;
+        if(logisticsServices) {
+            let validLogisticsCompany = true;
 
-        // Get logistics users of the company. Check if they have Expo push notifications.
-        const expoPushNotifications = await getExpoTokensOfLogisticsCompany(logisticsCompany);
+            // Attempt to see if logistics company provides the truck service.
+            if(makeTruckBooking) {
+                if(!_.find(logisticsServices, ['type', 'TYPE_TRUCK'])) {
+                    validLogisticsCompany = false;
+                }
+            }
 
-        // Send job requests only if expo tokens can be found.
-        if(expoPushNotifications.length > 0) {
-            const jobRequest = new JobRequest({
-                job: job._id,
-                logisticsCompany: logisticsCompany._id,
-                expoPushNotifications,
-                status: 'PENDING'
-            });
-            await jobRequest.save();
-            jobRequests.push(jobRequest);
+            // Attempt to see if logistics company provides the boat service.
+            if(makeLighterBooking) {
+                if(!_.find(logisticsServices, ['type', 'TYPE_BOAT'])) {
+                    validLogisticsCompany = false;
+                }
+            }
+
+            // If logistics company provides the services, send the push notifications.
+            if(validLogisticsCompany) {
+                // Get logistics users of the company. Check if they have Expo push notifications.
+                const expoPushNotifications = await getExpoTokensOfLogisticsCompany(logisticsCompany);
+
+                // Send job requests only if expo tokens can be found.
+                if(expoPushNotifications.length > 0) {
+                    const jobRequest = new JobRequest({
+                        job: job._id,
+                        logisticsCompany: logisticsCompany._id,
+                        expoPushNotifications,
+                        status: 'PENDING'
+                    });
+                    await jobRequest.save();
+                    jobRequests.push(jobRequest);
+                }
+            }
         }
     }
 
@@ -182,9 +212,10 @@ async function sendJobAssignmentNotifications(jobAssignment) {
 }
 
 async function sendJobDetailsUpdate(job) {
-    const jobAssignment = await getJobAssignment(job);
-    
-    if(jobAssignment) {
+    const jobAssignments = await getJobAssignments(job);
+
+    for(let i = 0; i < jobAssignments.length; i++) {
+        const jobAssignment = jobAssignments[i];
         const {logisticsCompany} = jobAssignment;
         if(logisticsCompany) {
             // Get logistics users of the company. Check if they have Expo push notifications.
@@ -207,9 +238,10 @@ async function sendJobDetailsUpdate(job) {
 }
 
 async function sendPSAJobBerthUpdate(job) {
-    const jobAssignment = await getJobAssignment(job);
+    const jobAssignments = await getJobAssignments(job);
 
-    if(jobAssignment) {
+    for(let i = 0; i < jobAssignments.length; i++) {
+        const jobAssignment = jobAssignments[i];
         const {logisticsCompany} = jobAssignment;
         if(logisticsCompany) {
             // Get logistics users of the company. Check if they have Expo push notifications.
