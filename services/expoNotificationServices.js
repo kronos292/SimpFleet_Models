@@ -102,7 +102,9 @@ async function sendJobRequestNotifications(job) {
         model: "logisticsServices"
     }).select();
 
-    const {makeTruckBooking, makeLighterBooking} = job;
+    const {services} = job;
+    const makeTruckBooking = _.find(services, ['key', 'TRUCK_BOOKING']);
+    const makeLighterBooking = _.find(services, ['key', 'BOAT_BOOKING']);
     const jobRequestLogisticsServices = [];
     if(makeTruckBooking) {
         const logisticsService = await LogisticsService.findOne({type: 'TYPE_TRUCK'}).select();
