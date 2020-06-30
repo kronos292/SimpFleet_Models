@@ -136,7 +136,8 @@ async function sendJobRequestNotifications(job) {
                         job: job._id,
                         logisticsCompany: logisticsCompany._id,
                         expoPushNotifications,
-                        status: 'PENDING'
+                        status: 'PENDING',
+                        logisticsServices
                     });
                     await jobRequest.save();
                     jobRequests.push(jobRequest);
