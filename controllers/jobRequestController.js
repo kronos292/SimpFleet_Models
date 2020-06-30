@@ -78,6 +78,9 @@ async function find(findMethod, params) {
     }).populate({
         path: "expoPushNotifications",
         model: "expoPushNotifications",
+    }).populate({
+        path: "logisticsServices",
+        model: "logisticsServices",
     }).select();
 }
 
@@ -93,58 +96,62 @@ async function create(data) {
 // Function to update data
 async function update(data) {
     let jobRequest = await find('findOne', {_id: data._id});
-    const {job, logisticsCompany} = jobRequest;
+    const {job, logisticsCompany, logisticsServices} = jobRequest;
+    for(let z = 0; z < logisticsServices.length; z++) {
+        const logisticsService = logisticsServices[z];
 
-    // Compare db data and new data.
-    if(jobRequest.status === 'PENDING' && data.status === 'ACCEPTED') {
-        // If status is changed from pending to accepted, Check for acceptance by other 3PLs.
-        // If no other 3PLs have accepted the job already, assign the job to this 3PL.
-        const jobAssignment = await JobAssignment.findOne({
-            job: job._id
-        }).populate({
-            path: "job",
-            model: "jobs",
-            populate: [
-                {
-                    path: "user",
-                    model: "users",
-                    populate: {
-                        path: "userCompany",
-                        model: "userCompanies"
+        // Compare db data and new data.
+        if(jobRequest.status === 'PENDING' && data.status === 'ACCEPTED') {
+            // If status is changed from pending to accepted, Check for acceptance by other 3PLs.
+            // If no other 3PLs have accepted the job already, assign the job to this 3PL.
+            const jobAssignment = await JobAssignment.findOne({
+                job: job._id,
+                logisticsService: logisticsService._id
+            }).populate({
+                path: "job",
+                model: "jobs",
+                populate: [
+                    {
+                        path: "user",
+                        model: "users",
+                        populate: {
+                            path: "userCompany",
+                            model: "userCompanies"
+                        }
+                    },
+                    {
+                        path: "vessel",
+                        model: "vessels",
+                    },
+                    {
+                        path: "vesselLoadingLocation",
+                        model: "vesselLoadingLocations",
                     }
-                },
-                {
-                    path: "vessel",
-                    model: "vessels",
-                },
-                {
-                    path: "vesselLoadingLocation",
-                    model: "vesselLoadingLocations",
-                }
-            ]
-        }).populate({
-            path: "logisticsCompany",
-            model: "logisticsCompanies"
-        }).select();
-        if(jobAssignment) {
-            if(jobAssignment.status === 'Pending') {
-                jobAssignment.status = 'Assigned';
-                jobAssignment.logisticsCompany = logisticsCompany._id;
-                await jobAssignment.save();
+                ]
+            }).populate({
+                path: "logisticsCompany",
+                model: "logisticsCompanies"
+            }).select();
+            if(jobAssignment) {
+                if(jobAssignment.status === 'Pending') {
+                    jobAssignment.status = 'Assigned';
+                    jobAssignment.logisticsCompany = logisticsCompany._id;
+                    await jobAssignment.save();
 
-                // Send job assignment expo notification.
-                await expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
+                    // Send job assignment expo notification.
+                    expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
 
-                const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
-                for(let i = 0; i < jobRequests.length; i++) {
-                    jobRequests[i].status = 'PASSED';
-                    await jobRequests[i].save();
-                }
-            } else if(jobAssignment.status === 'Assigned') {
-                const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
-                for(let i = 0; i < jobRequests.length; i++) {
-                    jobRequests[i].status = 'PASSED';
-                    await jobRequests[i].save();
+                    const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
+                    for(let i = 0; i < jobRequests.length; i++) {
+                        jobRequests[i].status = 'PASSED';
+                        await jobRequests[i].save();
+                    }
+                } else if(jobAssignment.status === 'Assigned') {
+                    const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
+                    for(let i = 0; i < jobRequests.length; i++) {
+                        jobRequests[i].status = 'PASSED';
+                        await jobRequests[i].save();
+                    }
                 }
             }
         }
