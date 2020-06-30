@@ -2,7 +2,7 @@ const axios = require('axios');
 const moment = require('moment');
 const _ = require('lodash');
 
-const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment} = require('../util/models');
+const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment, LogisticsService} = require('../util/models');
 
 // Get job assignment from job id.
 async function getJobAssignments(job) {
@@ -103,6 +103,15 @@ async function sendJobRequestNotifications(job) {
     }).select();
 
     const {makeTruckBooking, makeLighterBooking} = job;
+    const jobRequestLogisticsServices = [];
+    if(makeTruckBooking) {
+        const logisticsService = await LogisticsService.findOne({type: 'TYPE_TRUCK'}).select();
+        jobRequestLogisticsServices.push(logisticsService);
+    }
+    if(makeLighterBooking) {
+        const logisticsService = await LogisticsService.findOne({type: 'TYPE_BOAT'}).select();
+        jobRequestLogisticsServices.push(logisticsService);
+    }
 
     const jobRequests = [];
     for(let i = 0; i < logisticsCompanies.length; i++) {
@@ -137,7 +146,7 @@ async function sendJobRequestNotifications(job) {
                         logisticsCompany: logisticsCompany._id,
                         expoPushNotifications,
                         status: 'PENDING',
-                        logisticsServices
+                        logisticsServices: jobRequestLogisticsServices
                     });
                     await jobRequest.save();
                     jobRequests.push(jobRequest);
