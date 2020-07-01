@@ -5,10 +5,16 @@ async function find(findMethod, params) {
     return await User[findMethod](params).populate({
         path: 'userCompany',
         model: 'userCompanies',
-        populate: {
-            path: 'productSuites',
-            model: 'productSuites'
-        }
+        populate: [
+            {
+                path: 'productSuites',
+                model: 'productSuites'
+            },
+            {
+                path: 'logisticsCompanies',
+                model: 'logisticsCompanies'
+            }
+        ]
     }).populate({
         path: 'creditWallet',
         model: 'creditWallets',
