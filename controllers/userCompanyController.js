@@ -21,6 +21,7 @@ async function update(data) {
     const userCompany = await find('findOne', {_id: data._id});
     userCompany.name = data.name;
     userCompany.companyAccountContact = data.companyAccountContact;
+    userCompany.logisticsCompanies = data.logisticsCompanies;
     await userCompany.save();
 
     return userCompany;
