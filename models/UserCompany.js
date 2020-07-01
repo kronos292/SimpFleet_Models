@@ -6,7 +6,8 @@ const schema = new Schema({
     location: {type: Schema.Types.ObjectId, ref: 'locations'},
     companyAccountContact: {type: Schema.Types.ObjectId, ref: 'companyAccountContacts'},
     telegramGroupChatId: {type: String, default: ""},
-    productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}]
+    productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}],
+    logisticsCompanies: [{type: Schema.Types.ObjectId, ref: 'productSuites'}] // Preferred logistics companies assigned to the company.
 });
 
 module.exports = mongoose.model('userCompanies', schema);
