@@ -11,6 +11,9 @@ async function find(findMethod, params) {
     }).populate({
         path: 'productSuites',
         model: 'productSuites'
+    }).populate({
+        path: 'logisticsCompanies',
+        model: 'logisticsCompanies'
     }).select();
 }
 
