@@ -21,4 +21,5 @@ module.exports = {
     jobTrackerController: require('../controllers/jobTrackerController'),
     lighterBoatCompanyController: require('../controllers/lighterBoatCompanyController'),
     lighterBoatController: require('../controllers/lighterBoatController'),
+    transportUserController: require('../controllers/transportUserController'),
 };
