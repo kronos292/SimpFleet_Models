@@ -63,11 +63,10 @@ async function getExpoTokensOfLogisticsCompany(logisticsCompany) {
     return expoPushNotifications;
 }
 
-// Send expo notifications via server.
-async function sendExpoNotifications(expoPushNotifications, title, body, data) {
-    for(let i = 0; i < expoPushNotifications.length; i++) {
-        const expoPushNotification = expoPushNotifications[i];
-        const {expoPushNotificationToken} = expoPushNotification;
+// Send expo notification via token.
+async function buildExpoNotification(expoPushNotificationTokens, title, body, data) {
+    for(let i = 0; i < expoPushNotificationTokens.length; i++) {
+        const expoPushNotificationToken = expoPushNotificationTokens[i];
         const {token} = expoPushNotificationToken;
 
         try {
@@ -93,6 +92,17 @@ async function sendExpoNotifications(expoPushNotifications, title, body, data) {
             console.log(err.response.data.errors);
         }
     }
+}
+
+// Extract tokens from expo notifications to send.
+async function sendExpoNotifications(expoPushNotifications, title, body, data) {
+    const expoPushNotificationTokens = [];
+    for(let i = 0; i < expoPushNotifications.length; i++) {
+        const expoPushNotification = expoPushNotifications[i];
+        const {expoPushNotificationToken} = expoPushNotification;
+        expoPushNotificationTokens.push(expoPushNotificationToken);
+    }
+    await buildExpoNotification(expoPushNotificationTokens, title, body, data);
 }
 
 async function sendJobRequestNotifications(job) {
@@ -275,9 +285,23 @@ async function sendPSAJobBerthUpdate(job) {
     }
 }
 
+async function sendDriverAssignmentNotifications(transportUser, job) {
+    const {vesselLoadingLocation, jobTrip} = job;
+
+    // Set notification details.
+    const title = 'Job Assignment';
+    const body = `Job ${job.id} has been assigned to you. Going to ${vesselLoadingLocation.name}`;
+
+    await buildExpoNotification(transportUser.expoPushNotificationTokens, title, body, {
+        jobTripId: jobTrip._id,
+        type: 'DRIVER_ASSIGNMENT'
+    });
+}
+
 module.exports = {
     sendJobRequestNotifications,
     sendJobAssignmentNotifications,
     sendJobDetailsUpdate,
-    sendPSAJobBerthUpdate
+    sendPSAJobBerthUpdate,
+    sendDriverAssignmentNotifications
 }
