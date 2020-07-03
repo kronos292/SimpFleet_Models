@@ -289,8 +289,8 @@ async function sendDriverAssignmentNotifications(transportUser, job) {
     const {vesselLoadingLocation, jobTrip} = job;
 
     // Set notification details.
-    const title = 'Job Assignment';
-    const body = `Job ${job.id} has been assigned to you. Going to ${vesselLoadingLocation.name}`;
+    const title = 'Job Assignment to Drivers';
+    const body = `Job ${job.index} has been assigned to you. Going to ${vesselLoadingLocation.name}.`;
 
     await buildExpoNotification(transportUser.expoPushNotificationTokens, title, body, {
         jobTripId: jobTrip._id,
