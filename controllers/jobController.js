@@ -182,7 +182,7 @@ async function buildJobNotification(job) {
         notifications.push(
             {
                 key: 'Additional Items',
-                value: jobOfflandItemString
+                value: jobAdditionalItemString
             }
         );
     }
