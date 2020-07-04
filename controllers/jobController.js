@@ -329,6 +329,24 @@ async function buildJobNotification(job) {
         );
     }
 
+    // Job PIC.
+    if(job.jobPICName !== '') {
+        notifications.push(
+            {
+                key: 'PIC Name',
+                value: job.jobPICName
+            }
+        );
+    }
+    if(job.jobPICContact !== '') {
+        notifications.push(
+            {
+                key: 'PIC Contact',
+                value: job.jobPICContact
+            }
+        );
+    }
+
     // Job pickup.
     if (job.pickupDetails.length > 0) {
         let messageString = '\n';
