@@ -64,6 +64,9 @@ async function find(findMethod, params) {
         path: 'jobOfflandItems',
         model: 'jobOfflandItems'
     }).populate({
+        path: 'jobAdditionalItems',
+        model: 'jobAdditionalItems'
+    }).populate({
         path: 'jobTrip',
         model: 'jobTrips'
     }).populate({
