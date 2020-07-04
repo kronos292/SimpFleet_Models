@@ -50,4 +50,5 @@ module.exports = {
     LogisticsService: require('../models/LogisticsService'),
     LighterCaptain: require('../models/LighterCaptain'),
     LighterOperator: require('../models/LighterOperator'),
+    JobAdditionalItem: require('../models/JobAdditionalItem'),
 };
