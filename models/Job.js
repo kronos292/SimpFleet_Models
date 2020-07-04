@@ -48,6 +48,8 @@ const jobSchema = new Schema({
     status: {type: String, default: "PENDING"}, // PENDING, APPROVED, NO_MATCH, CANCELLED
     boardingName: {type: String, default: ''},
     boardingContact: {type: String, default: ''},
+    jobPICName: {type: String, default: ''},
+    jobPICContact: {type: String, default: ''},
     services: [{type: Schema.Types.Mixed, default: ''}], // Services required in a job
 });
 
