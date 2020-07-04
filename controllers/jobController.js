@@ -326,14 +326,12 @@ async function buildJobNotification(job) {
     }
 
     // Dangerous Goods.
-    if(job.hasDGItems) {
-        notifications.push(
-            {
-                key: 'DG Items',
-                value: job.hasDGItems
-            }
-        );
-    }
+    notifications.push(
+        {
+            key: 'Goods contain DG Items',
+            value: job.hasDGItems? 'Yes': 'No'
+        }
+    );
 
     // Boarding officer.
     notifications.push(
