@@ -96,6 +96,13 @@ async function buildJobNotification(job) {
         jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
     }
 
+    const jobAdditionalItems = job.jobAdditionalItems;
+    let jobAdditionalItemString = jobAdditionalItems.length > 0 ? `${jobAdditionalItems[0].quantity} ${jobAdditionalItems[0].uom}` : '';
+    for (let i = 1; i < jobAdditionalItems.length; i++) {
+        const jobAdditionalItem = jobAdditionalItems[i];
+        jobAdditionalItemString += `, ${jobAdditionalItem.quantity} ${jobAdditionalItem.uom}`
+    }
+
     const userCompany = await UserCompany.findOne({_id: job.user.userCompany}).select();
 
     const notifications = [
@@ -165,6 +172,16 @@ async function buildJobNotification(job) {
         notifications.push(
             {
                 key: 'Items to Offland',
+                value: jobOfflandItemString
+            }
+        );
+    }
+
+    // Additional Items.
+    if(jobAdditionalItemString !== '') {
+        notifications.push(
+            {
+                key: 'Additional Items',
                 value: jobOfflandItemString
             }
         );
@@ -301,6 +318,16 @@ async function buildJobNotification(job) {
             {
                 key: 'Create Offland Permit',
                 value: 'Yes'
+            }
+        );
+    }
+
+    // Dangerous Goods.
+    if(job.hasDGItems) {
+        notifications.push(
+            {
+                key: 'DG Items',
+                value: job.hasDGItems
             }
         );
     }

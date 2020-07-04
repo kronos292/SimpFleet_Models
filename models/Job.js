@@ -12,6 +12,7 @@ const jobSchema = new Schema({
     index: {type: String, default: ''},
     jobItems: [{type: Schema.Types.ObjectId, ref: 'jobItems'}],
     jobOfflandItems: [{type: Schema.Types.ObjectId, ref: 'jobOfflandItems'}],
+    jobAdditionalItems: [{type: Schema.Types.ObjectId, ref: 'jobAdditionalItems'}],
     careOffParties: [{type: Schema.Types.ObjectId, ref: 'careOffParties'}],
     jobBookingDateTime: {type: Date, default: new Date()},
     vesselArrivalDateTime: {type: Date, default: null},
@@ -27,6 +28,7 @@ const jobSchema = new Schema({
     createDSA: {type: Boolean, default: false},
     createOfflandPermit: {type: Boolean, default: false},
     hasBoarding: {type: Boolean, default: false},
+    hasDGItems: {type: Boolean, default: false}, // Whether there are DG items.
     pickup: {type: Boolean, default: false},
     pickupDetails: [{type: Schema.Types.ObjectId, ref: 'pickupDetails'}],
     offlandDetails: [{type: Schema.Types.ObjectId, ref: 'offlandDetails'}],
