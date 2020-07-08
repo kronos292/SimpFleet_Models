@@ -140,18 +140,13 @@ async function update(data) {
 
                     // Send job assignment expo notification.
                     expoNotificationServices.sendJobAssignmentNotifications(jobAssignment);
+                }
 
-                    const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
-                    for(let i = 0; i < jobRequests.length; i++) {
-                        jobRequests[i].status = 'PASSED';
-                        await jobRequests[i].save();
-                    }
-                } else if(jobAssignment.status === 'Assigned') {
-                    const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
-                    for(let i = 0; i < jobRequests.length; i++) {
-                        jobRequests[i].status = 'PASSED';
-                        await jobRequests[i].save();
-                    }
+                // Set all job requests for the job to passed.
+                const jobRequests = await find('find', {job: job._id, status: 'PENDING'});
+                for(let i = 0; i < jobRequests.length; i++) {
+                    jobRequests[i].status = 'PASSED';
+                    await jobRequests[i].save();
                 }
             }
         }
