@@ -54,4 +54,6 @@ module.exports = {
     LighterCaptain: require('../models/LighterCaptain'),
     LighterOperator: require('../models/LighterOperator'),
     JobAdditionalItem: require('../models/JobAdditionalItem'),
+    TransporterGPSLocation: require('../models/TransporterGPSLocation'),
+    TransporterGPSTracking: require('../models/TransporterGPSTracking'),
 };
