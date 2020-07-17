@@ -206,7 +206,7 @@ async function addJobCreationJobTrackers(job) {
     );
 
     // Insert the job trackers into db.
-    await JobTracker.insertMany(jobTrackers);
+    return await JobTracker.insertMany(jobTrackers);
 }
 
 module.exports = {
