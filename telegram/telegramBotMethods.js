@@ -373,7 +373,7 @@ async function sendDriverAssignmentNotification(jobTrip) {
     jobTrip = await jobTripController.find('findOne', {_id: jobTrip._id});
     const {driver, jobs} = jobTrip;
 
-    let text = `${driver.firstName} ${driver.lastName} has been assigned to Job Trip ${jobTrip.id}.\n`;
+    let text = `${driver.firstName} ${driver.lastName} has been assigned to Job Trip ${jobTrip.id}. Jobs involved:\n\n`;
     for(let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
 
