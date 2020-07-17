@@ -53,6 +53,7 @@ const jobSchema = new Schema({
     jobPICName: {type: String, default: ''},
     jobPICContact: {type: String, default: ''},
     services: [{type: Schema.Types.Mixed, default: ''}], // Services required in a job
+    version: {type: Number, default: 1},
 });
 
 module.exports = mongoose.model('jobs', jobSchema);
