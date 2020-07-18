@@ -1,4 +1,5 @@
 const moment = require('moment');
+const _ = require('lodash');
 
 const {Job, UserCompany} = require('../util/models');
 
@@ -409,7 +410,19 @@ async function buildJobNotification(job) {
     return notifications;
 }
 
+async function checkJobCompletion(job) {
+    const {version, jobTrackers} = job;
+
+    if(version === 2) {
+        const jobTracker = _.find(jobTrackers, ['type', 'END']);
+        return jobTracker.isCompleted;
+    } else {
+        return jobTrackers.length >= 6;
+    }
+}
+
 module.exports = {
     find,
-    buildJobNotification
+    buildJobNotification,
+    checkJobCompletion
 };
