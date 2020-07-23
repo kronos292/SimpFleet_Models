@@ -69,7 +69,15 @@ async function find(findMethod, params) {
         model: 'jobAdditionalItems'
     }).populate({
         path: 'jobTrip',
-        model: 'jobTrips'
+        model: 'jobTrips',
+        populate: {
+            path: 'driver',
+            model: 'transportUsers',
+            populate: {
+                path: 'company',
+                model: 'logisticsCompanies'
+            }
+        }
     }).populate({
         path: 'estimatedJobPricingBreakdowns',
         model: 'jobPricingBreakdowns'
