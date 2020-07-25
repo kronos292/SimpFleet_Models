@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const jobTrackerSchema = new Schema({
 	index: { type: Number, default: -1 },
 	timestamp: { type: Date, default: new Date() },
-	trackingType: { type: String, default: "" }, // For icon display.
+	trackingType: { type: String, default: "" }, // Electronic, Storage, Pickup, Offland, Loading, Return
 	title: { type: String, default: "" },
 	description: { type: String, default: "" },
 	remarks: { type: String, default: "" },
@@ -24,7 +24,10 @@ const jobTrackerSchema = new Schema({
 	jobTrackerItemCheckLists: {
 		type: Schema.Types.ObjectId,
 		ref: "jobTrackerItemCheckLists"
-	}
+	},
+	pickupDetail: {type: Schema.Types.ObjectId, ref: 'pickupDetails'},
+	offlandDetail: {type: Schema.Types.ObjectId, ref: 'offlandDetails'},
+	loadingDetail: {type: Schema.Types.ObjectId, ref: 'loadingDetails'},
 });
 
 module.exports = mongoose.model("jobTrackers", jobTrackerSchema);

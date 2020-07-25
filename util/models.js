@@ -56,4 +56,5 @@ module.exports = {
     JobAdditionalItem: require('../models/JobAdditionalItem'),
     TransporterGPSLocation: require('../models/TransporterGPSLocation'),
     TransporterGPSTracking: require('../models/TransporterGPSTracking'),
+    LoadingDetail: require('../models/LoadingDetail'),
 };

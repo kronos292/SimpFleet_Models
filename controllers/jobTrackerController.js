@@ -1,4 +1,4 @@
-const {JobTracker} = require('../util/models');
+const {JobTracker, LoadingDetail} = require('../util/models');
 
 async function find(findMethod, params) {
     return await JobTracker[findMethod](params).populate({
@@ -18,9 +18,17 @@ async function create(data) {
 
 // Create job trackers based on job requirements.
 async function addJobCreationJobTrackers(job) {
-    const {pickupDetails, offlandDetails, jobItems, jobOfflandItems} = job;
+    const {pickupDetails, offlandDetails, jobItems, jobOfflandItems, vesselLoadingLocation, otherVesselLoadingLocation, vesselLoadingDateTime} = job;
     const jobTrackers = [];
     let index = 1;
+
+    // Create loading detail.
+    const loadingDetail = new LoadingDetail({
+        vesselLoadingLocation,
+        otherVesselLoadingLocation,
+        vesselLoadingDateTime
+    });
+    await loadingDetail.save();
 
     // Add pending confirmation status.
     let description = "We have received your job booking and are currently checking the details. We will send you a confirmation email once everything is verified.";
@@ -60,7 +68,6 @@ async function addJobCreationJobTrackers(job) {
         }
     );
 
-
     if(jobItems.length > 0) {
         // Add pickups/received statuses.
         if(pickupDetails.length > 0) {
@@ -72,7 +79,7 @@ async function addJobCreationJobTrackers(job) {
                     {
                         index: index++,
                         timestamp: null,
-                        trackingType: 'Truck',
+                        trackingType: 'Pickup',
                         title: 'On the way to Pickup',
                         description,
                         job: job._id,
@@ -81,7 +88,8 @@ async function addJobCreationJobTrackers(job) {
                         location: null,
                         type: 'ONGOING',
                         isCompleted: false,
-                        isDocumentRequired: false
+                        isDocumentRequired: false,
+                        pickupDetail
                     }
                 );
             }
@@ -111,7 +119,7 @@ async function addJobCreationJobTrackers(job) {
             {
                 index: index++,
                 timestamp: null,
-                trackingType: 'Truck',
+                trackingType: 'Loading',
                 title: 'Items are on delivery',
                 description,
                 job: job._id,
@@ -120,7 +128,8 @@ async function addJobCreationJobTrackers(job) {
                 location: null,
                 type: 'ONGOING',
                 isCompleted: false,
-                isDocumentRequired: false
+                isDocumentRequired: false,
+                loadingDetail
             }
         );
 
@@ -130,7 +139,7 @@ async function addJobCreationJobTrackers(job) {
             {
                 index: index++,
                 timestamp: null,
-                trackingType: 'Truck',
+                trackingType: 'Electronic',
                 title: 'Items have been received by customer',
                 description,
                 job: job._id,
@@ -149,7 +158,7 @@ async function addJobCreationJobTrackers(job) {
             {
                 index: index++,
                 timestamp: null,
-                trackingType: 'Truck',
+                trackingType: 'Loading',
                 title: 'On the way to load items',
                 description,
                 job: job._id,
@@ -158,7 +167,8 @@ async function addJobCreationJobTrackers(job) {
                 location: null,
                 type: 'ONGOING',
                 isCompleted: false,
-                isDocumentRequired: false
+                isDocumentRequired: false,
+                loadingDetail
             }
         );
     }
@@ -172,7 +182,7 @@ async function addJobCreationJobTrackers(job) {
             {
                 index: index++,
                 timestamp: null,
-                trackingType: 'Truck',
+                trackingType: 'Offland',
                 title: 'On the way to Offland',
                 description,
                 job: job._id,
@@ -181,7 +191,8 @@ async function addJobCreationJobTrackers(job) {
                 location: null,
                 type: 'ONGOING',
                 isCompleted: false,
-                isDocumentRequired: false
+                isDocumentRequired: false,
+                offlandDetail
             }
         );
     }
