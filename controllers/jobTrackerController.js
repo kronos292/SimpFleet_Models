@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const {JobTracker, LoadingDetail} = require('../util/models');
 
 async function find(findMethod, params) {
@@ -220,8 +222,59 @@ async function addJobCreationJobTrackers(job) {
     return await JobTracker.insertMany(jobTrackers);
 }
 
+async function shuffleJobTrackers(jobTrackers, jobTrackerObj, type) {
+    // Sort all job trackers by index.
+    jobTrackers = jobTrackers.sort((a, b) => {
+        return a.index = b.index;
+    });
+
+    let newJobTrackers = [];
+    if(type === 'REMOVE') {
+        let toDeductIndex = false;
+        for(let i = 0; i < jobTrackers.length; i++) {
+            const jobTracker = jobTrackers[i];
+            if(jobTracker._id !== jobTrackerObj._id) {
+                if(toDeductIndex) {
+                    jobTracker.index = jobTracker.index - 1;
+                }
+                newJobTrackers.push(jobTracker);
+            } else {
+                toDeductIndex = true;
+            }
+        }
+    } else if(type === 'ADD') {
+
+    }
+}
+
+async function updatePickupTrackers(job, newPickupDetails) {
+    let {jobTrackers} = job;
+    jobTrackers = jobTrackers.sort((a, b) => {
+        return a.index - b.index;
+    });
+    const pickupJobTrackers = _.filter(jobTrackers, (jobTracker) => {
+        return jobTracker.trackingType === 'Pickup';
+    });
+    for(let i = 0; i < pickupJobTrackers.length; i++) {
+        const pickupJobTracker = pickupJobTrackers[i];
+        const {pickupDetail} = pickupJobTracker;
+        const newPickupDetail = _.find(newPickupDetails, ['_id', pickupDetail._id]);
+        if(!newPickupDetail) {
+            jobTrackers = await shuffleJobTrackers(jobTrackers, pickupJobTracker, 'REMOVE');
+        }
+        newPickupDetails = _.remove(newPickupDetails, (newPickupDetail) => {
+            return pickupDetail._id === newPickupDetail._id;
+        });
+    }
+    for(let i = 0; i < newPickupDetails.length; i++) {
+        // Create a pickup job tracker.
+        jobTrackers = await shuffleJobTrackers(jobTrackers, pickupJobTracker, 'ADD');
+    }
+}
+
 module.exports = {
     find,
     create,
-    addJobCreationJobTrackers
+    addJobCreationJobTrackers,
+    updatePickupTrackers
 };
