@@ -822,8 +822,78 @@ module.exports = {
     },
     sendUserJobDriverAssignment: async(job) => {
         job = await jobController.find('findOne', {_id: job._id});
-        const {user, jobTrip} = job;
+        let {user, jobTrip, jobItems, jobOfflandItems, careOffParties} = job;
         const {driver} = jobTrip;
+
+        // Add items of care-off parties
+        for (let i = 0; i < careOffParties.length; i++) {
+            const careOffParty = careOffParties[i];
+            jobItems = jobItems.concat(careOffParty.jobItems);
+            jobOfflandItems = jobOfflandItems.concat(careOffParty.jobOfflandItems);
+        }
+
+        // Merge job items with duplicate uom
+        const mergedJobItems = [];
+        for (let i = 0; i < jobItems.length; i++) {
+            const jobItem = jobItems[i];
+            let foundMergedJobItem = null;
+            for (let j = 0; j < mergedJobItems.length; j++) {
+                const mergedJobItem = mergedJobItems[j];
+                if (mergedJobItem.uom === jobItem.uom) {
+                    foundMergedJobItem = mergedJobItem;
+                    break;
+                }
+            }
+            if(foundMergedJobItem !== null) {
+                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobItem.quantity);
+            } else {
+                mergedJobItems.push(jobItem);
+            }
+        }
+        jobItems = mergedJobItems;
+
+        // Merge job offland items with duplicate uom
+        const mergedJobOfflandItems = [];
+        for (let i = 0; i < jobOfflandItems.length; i++) {
+            const jobOfflandItem = jobOfflandItems[i];
+            let foundMergedJobItem = null;
+            for (let j = 0; j < mergedJobOfflandItems.length; j++) {
+                const mergedJobItem = mergedJobOfflandItems[j];
+                if (mergedJobItem.uom === jobOfflandItem.uom) {
+                    foundMergedJobItem = mergedJobItem;
+                    break;
+                }
+            }
+            if(foundMergedJobItem !== null) {
+                foundMergedJobItem.quantity = parseInt(foundMergedJobItem.quantity) + parseInt(jobOfflandItem.quantity);
+            } else {
+                mergedJobOfflandItems.push(jobOfflandItem);
+            }
+        }
+        jobOfflandItems = mergedJobOfflandItems;
+
+        let itemString = jobItems.length > 0 ? `${jobItems[0].quantity} ${jobItems[0].uom}` : '';
+        for (let i = 1; i < jobItems.length; i++) {
+            const jobItem = jobItems[i];
+            itemString += `, ${jobItem.quantity} ${jobItem.uom}`
+        }
+
+        let jobOfflandItemString = jobOfflandItems.length > 0 ? `${jobOfflandItems[0].quantity} ${jobOfflandItems[0].uom}` : '';
+        for (let i = 1; i < jobOfflandItems.length; i++) {
+            const jobOfflandItem = jobOfflandItems[i];
+            jobOfflandItemString += `, ${jobOfflandItem.quantity} ${jobOfflandItem.uom}`
+        }
+
+        let pickupLocationsStringArray = [];
+        if(job.pickupDetails) {
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickupDetail = job.pickupDetails[i];
+                if(pickupDetail && pickupDetail.pickupLocation && pickupDetail.pickupDateTime) {
+                    const pickUpDateTime = moment.tz(new Date(pickupDetail.pickupDateTime), "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
+                    pickupLocationsStringArray.push(pickUpDateTime + ' - ' + pickupDetail.pickupLocation.addressString);
+                }
+            }
+        }
 
         // Send out email via template
         const templateName = 'userJobDriverAssignment';
@@ -834,7 +904,13 @@ module.exports = {
         const locals = {
             user,
             driver,
-            job
+            job,
+            itemString,
+            jobOfflandItemString,
+            pickupLocationsStringArray,
+            vesselLoadingDateTime: job.vesselLoadingDateTime !== "" ? moment(new Date(job.vesselLoadingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaBerthingDateTime: job.psaBerthingDateTime !== "" ? moment(new Date(job.psaBerthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
+            psaUnberthingDateTime: job.psaUnberthingDateTime !== "" ? moment(new Date(job.psaUnberthingDateTime)).tz("Asia/Singapore").format('MMMM Do YYYY, h:mm:ss a') : "",
         };
         await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     }
