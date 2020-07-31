@@ -8,6 +8,7 @@ const JobAssignment = require('../models/JobAssignment');
 const User = require('../models/User');
 
 const keys = require('../../../config/keys');
+const jobController = require("../controllers/jobController");
 
 async function getTemplatePath(templateName) {
     return path.join(__dirname, 'templates', templateName);
@@ -818,5 +819,23 @@ module.exports = {
                 }
             }
         }
+    },
+    sendUserJobDriverAssignment: async(job) => {
+        job = await jobController.find('findOne', {_id: job._id});
+        const {user, jobTrip} = job;
+        const {driver} = jobTrip;
+
+        // Send out email via template
+        const templateName = 'userJobDriverAssignment';
+        const toEmail = user.email;
+        const subject = `Driver Assigned to job - ${job.jobId}`;
+        const ccList = [keys.SHIP_SUPPLIES_DIRECT_TEAM_EMAIL];
+        const attachments = [];
+        const locals = {
+            user,
+            driver,
+            job
+        };
+        await sendEmail(templateName, toEmail, subject, ccList, attachments, locals);
     }
 };
