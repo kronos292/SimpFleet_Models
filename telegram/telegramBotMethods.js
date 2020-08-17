@@ -189,6 +189,25 @@ async function sendUserJobUpdateInfo(job, notificationArr) {
     }
 }
 
+async function sendUserJobTrackerUpdateInfo(job, jobTracker) {
+    const {user, index} = job;
+    const {userCompany} = user;
+
+    if(userCompany) {
+        const text = `Job Update for ${index}:\n\n`
+            + jobTracker.title;
+
+        try {
+            await api.sendMessage({
+                chat_id: userCompany.telegramGroupChatId,
+                text
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+}
+
 async function jobBerthTimingUpdate(job) {
     const {vessel} = job;
 
@@ -490,5 +509,6 @@ module.exports = {
     stopTransportLiveLocation,
     sendJobProgressReport,
     sendDriverAssignmentNotification,
-    sendUserJobUpdateInfo
+    sendUserJobUpdateInfo,
+    sendUserJobTrackerUpdateInfo
 };
