@@ -172,6 +172,23 @@ async function sendAdminJobUpdateInfo(job, notificationArr) {
     }
 }
 
+async function sendUserJobUpdateInfo(job, notificationArr) {
+    const jobDetails = await formJobMessage(job, notificationArr,"Update");
+    const {user} = job;
+    const {userCompany} = user;
+
+    if(userCompany) {
+        try {
+            await api.sendMessage({
+                chat_id: userCompany.telegramGroupChatId,
+                text: jobDetails
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+}
+
 async function jobBerthTimingUpdate(job) {
     const {vessel} = job;
 
