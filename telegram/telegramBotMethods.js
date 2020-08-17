@@ -489,5 +489,6 @@ module.exports = {
     updateTransportLiveLocation,
     stopTransportLiveLocation,
     sendJobProgressReport,
-    sendDriverAssignmentNotification
+    sendDriverAssignmentNotification,
+    sendUserJobUpdateInfo
 };
