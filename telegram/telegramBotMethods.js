@@ -14,7 +14,7 @@ const Invoice = require('../models/accounts/Invoice');
 const TransporterGPSLocation = require('../models/TransporterGPSLocation');
 const TransporterGPSTracking = require('../models/TransporterGPSTracking');
 const Job = require('../models/Job');
-const {jobTripController} = require('../util/controllers');
+const {jobTripController, jobController} = require('../util/controllers');
 
 const api = new telegram({
     token: keys.SIMPFLEET_TELEGRAM_BOT_TOKEN
@@ -423,6 +423,24 @@ async function sendDriverAssignmentNotification(jobTrip) {
     });
 }
 
+async function sendUserDriverAssignmentNotification(jobTrip) {
+    jobTrip = await jobTripController.find('findOne', {_id: jobTrip._id});
+    const {driver, jobs} = jobTrip;
+
+    for(let i = 0; i < jobs.length; i++) {
+        const job = await jobController.find('findOne', {_id: jobs[i]._id});
+        const {user} = job;
+        const {userCompany} = user;
+
+        let text = `${driver.firstName} ${driver.lastName} has been assigned to job ${job.index}. Contact No. is ${driver.contactNumber}`;
+
+        await api.sendMessage({
+            chat_id: userCompany.telegramGroupChatId,
+            text
+        });
+    }
+}
+
 module.exports = {
     sendJobBookingInfo: async (job, notificationArr) => {
         const jobDetails = await formJobMessage(job, notificationArr, "Create");
@@ -510,5 +528,6 @@ module.exports = {
     sendJobProgressReport,
     sendDriverAssignmentNotification,
     sendUserJobUpdateInfo,
-    sendUserJobTrackerUpdateInfo
+    sendUserJobTrackerUpdateInfo,
+    sendUserDriverAssignmentNotification
 };
