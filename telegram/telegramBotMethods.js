@@ -429,10 +429,15 @@ async function sendUserDriverAssignmentNotification(jobTrip) {
 
     for(let i = 0; i < jobs.length; i++) {
         const job = await jobController.find('findOne', {_id: jobs[i]._id});
-        const {user} = job;
+        const {user, vessel, jobId} = job;
+        const {vesselName} = vessel;
         const {userCompany} = user;
 
-        let text = `${driver.firstName} ${driver.lastName} has been assigned to job ${job.index}. Contact No. is ${driver.contactNumber}`;
+        let text = `Driver has been assigned to job ${job.index}:\n\n`;
+        text += `Driver Name: ${driver.firstName} ${driver.lastName}`;
+        text += `Driver Contact No.: ${driver.contactNumber}`;
+        text += `Job Number: ${jobId}`;
+        text += `Vessel: ${vesselName}`;
 
         await api.sendMessage({
             chat_id: userCompany.telegramGroupChatId,
