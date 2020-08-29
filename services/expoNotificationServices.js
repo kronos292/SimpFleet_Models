@@ -323,7 +323,7 @@ async function sendDriverAssignmentReminders() {
                         const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
                         let body = `No driver is currently assigned for job ${index}, delivery to ${vesselLoadingLocationName}. Please assign as soon as possible.`;
 
-                        Send out expo notifications.
+                        // Send out expo notifications.
                         await sendExpoNotifications(expoPushNotifications, title, body, {
                             jobId: job._id,
                             type: '3PL_DRIVER_ASSIGNMENT_REMINDER'
