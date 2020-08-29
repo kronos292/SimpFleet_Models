@@ -304,42 +304,30 @@ async function sendDriverAssignmentReminders() {
     const jobs = await jobController.find('find', {});
     for(let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
-        const {jobTrackers} = job;
-        if(jobTrackers.length < 6) {
+        const {jobTrackers, jobTrip} = job;
+        if(jobTrackers.length < 6 && jobTrip && !jobTrip.driver) {
             const logisticsService = await LogisticsService.findOne({type: 'TYPE_TRUCK'}).select();
-            const jobAssignment = await jobAssignmentController.find('findOne', {logisticsService});
+            const jobAssignment = await jobAssignmentController.find('findOne', {job: job._id, logisticsService});
             if(jobAssignment) {
                 const {logisticsCompany} = jobAssignment;
 
                 if(logisticsCompany) {
                     // Get logistics users of the company. Check if they have Expo push notifications.
                     const expoPushNotifications = await getExpoTokensOfLogisticsCompany(logisticsCompany);
-                    console.log(job.index);
-                    console.log(expoPushNotifications);
 
                     // Send job requests only if expo tokens can be found.
                     if(expoPushNotifications.length > 0) {
-                        // // Set notification details.
-                        // const title = `New Job Request`;
-                        // let {pickupDetails, index, vesselLoadingLocation, otherVesselLoadingLocation} = job;
-                        // const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
-                        // let body = `New job ${index}. Delivery to ${vesselLoadingLocationName}.`;
-                        // if(pickupDetails.length > 0) {
-                        //     pickupDetails = pickupDetails.sort((a, b) => {
-                        //         return a.pickupDateTime - b.pickupDateTime;
-                        //     });
-                        //     const pickupDetail = pickupDetails[0];
-                        //     const {pickupDateTime, pickupLocation} = pickupDetail;
-                        //     body += ` Pick up on ${moment(pickupDateTime).format('YYYY-MM-DD')} at ${moment(pickupDateTime).format('HH:mm:ss')}.`;
-                        // }
-                        // body += ' Click to accept/decline.';
-                        //
-                        // // Send out expo notifications.
-                        // await sendExpoNotifications(expoPushNotifications, title, body, {
-                        //     jobId: job._id,
-                        //     jobRequestId: jobRequest._id,
-                        //     type: 'JOB_REQUEST'
-                        // });
+                        // Set notification details.
+                        const title = `Driver Assignment Reminder`;
+                        let {pickupDetails, index, vesselLoadingLocation, otherVesselLoadingLocation} = job;
+                        const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
+                        let body = `No driver is currently assigned for job ${index}, delivery to ${vesselLoadingLocationName}. Reminder to assign as soon as possible.`;
+
+                        // Send out expo notifications.
+                        await sendExpoNotifications(expoPushNotifications, title, body, {
+                            jobId: job._id,
+                            type: '3PL_DRIVER_ASSIGNMENT_REMINDER'
+                        });
                     }
                 }
             }
