@@ -321,7 +321,7 @@ async function sendDriverAssignmentReminders() {
                         const title = `Driver Assignment Reminder`;
                         let {pickupDetails, index, vesselLoadingLocation, otherVesselLoadingLocation} = job;
                         const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
-                        let body = `No driver is currently assigned for job ${index}, delivery to ${vesselLoadingLocationName}. Reminder to assign as soon as possible.`;
+                        let body = `No driver is currently assigned for job ${index}, delivery to ${vesselLoadingLocationName}. Please assign as soon as possible.`;
 
                         // Send out expo notifications.
                         await sendExpoNotifications(expoPushNotifications, title, body, {
