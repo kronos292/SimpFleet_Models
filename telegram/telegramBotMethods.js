@@ -434,10 +434,10 @@ async function sendUserDriverAssignmentNotification(jobTrip) {
         const {userCompany} = user;
 
         let text = `Driver has been assigned to job ${job.index}:\n\n`;
-        text += `Driver Name: ${driver.firstName} ${driver.lastName}`;
-        text += `Driver Contact No.: ${driver.contactNumber}`;
-        text += `Job Number: ${jobId}`;
-        text += `Vessel: ${vesselName}`;
+        text += `Driver Name: ${driver.firstName} ${driver.lastName}\n`;
+        text += `Driver Contact No.: ${driver.contactNumber}\n`;
+        text += `Job Number: ${jobId}\n`;
+        text += `Vessel: ${vesselName}\n`;
 
         await api.sendMessage({
             chat_id: userCompany.telegramGroupChatId,
