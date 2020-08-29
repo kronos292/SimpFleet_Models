@@ -304,8 +304,8 @@ async function sendDriverAssignmentReminders() {
     const jobs = await jobController.find('find', {});
     for(let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
-        const {jobTrackers, jobTrip} = job;
-        if(jobTrackers.length < 6 && jobTrip && !jobTrip.driver) {
+        const {jobTrackers, jobTrip, isCancelled} = job;
+        if(jobTrackers.length < 6 && isCancelled !== 'Confirmed' && jobTrip && !jobTrip.driver) {
             const logisticsService = await LogisticsService.findOne({type: 'TYPE_TRUCK'}).select();
             const jobAssignment = await jobAssignmentController.find('findOne', {job: job._id, logisticsService});
             if(jobAssignment) {
@@ -323,7 +323,7 @@ async function sendDriverAssignmentReminders() {
                         const vesselLoadingLocationName = vesselLoadingLocation.type !== 'others'? vesselLoadingLocation.name: otherVesselLoadingLocation;
                         let body = `No driver is currently assigned for job ${index}, delivery to ${vesselLoadingLocationName}. Please assign as soon as possible.`;
 
-                        // Send out expo notifications.
+                        Send out expo notifications.
                         await sendExpoNotifications(expoPushNotifications, title, body, {
                             jobId: job._id,
                             type: '3PL_DRIVER_ASSIGNMENT_REMINDER'
