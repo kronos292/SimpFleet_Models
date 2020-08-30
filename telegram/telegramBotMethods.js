@@ -191,11 +191,12 @@ async function sendUserJobUpdateInfo(job, notificationArr) {
 
 async function sendUserJobTrackerUpdateInfo(jobObj, jobTracker) {
     const job = await jobController.find('findOne', {_id: jobObj._id});
-    const {user, index, vessel} = job;
+    const {user, index, vessel, jobId} = job;
     const {userCompany} = user;
 
     if(userCompany) {
         let text = `Job Update for ${index}:\n\n`;
+        text += `Job Number: ${jobId}\n`;
         if(vessel) {
             text += `Vessel: ${vessel.vesselName}\n`;
         }
