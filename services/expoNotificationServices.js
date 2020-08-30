@@ -3,7 +3,6 @@ const moment = require('moment');
 const _ = require('lodash');
 
 const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment, LogisticsService} = require('../util/models');
-const {jobController, jobAssignmentController} = require('../util/controllers');
 
 // Get job assignment from job id.
 async function getJobAssignments(job) {
@@ -301,6 +300,7 @@ async function sendDriverAssignmentNotifications(transportUser, job) {
 
 // Reminder to 3PL to assign driver to job.
 async function sendDriverAssignmentReminders() {
+    const {jobController, jobAssignmentController} = require('../util/controllers');
     const jobs = await jobController.find('find', {});
     for(let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
