@@ -189,13 +189,17 @@ async function sendUserJobUpdateInfo(job, notificationArr) {
     }
 }
 
-async function sendUserJobTrackerUpdateInfo(job, jobTracker) {
-    const {user, index} = job;
+async function sendUserJobTrackerUpdateInfo(jobObj, jobTracker) {
+    const job = await jobController.find('findOne', {_id: jobObj._id});
+    const {user, index, vessel} = job;
     const {userCompany} = user;
 
     if(userCompany) {
-        const text = `Job Update for ${index}:\n\n`
-            + jobTracker.title;
+        let text = `Job Update for ${index}:\n\n`;
+        if(vessel) {
+            text += `Vessel: ${vessel.vesselName}\n`;
+        }
+        text += `Status: ${jobTracker.title}\n`;
 
         try {
             await api.sendMessage({
