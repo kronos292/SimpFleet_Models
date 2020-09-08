@@ -20,6 +20,7 @@ const schema = new Schema({
     pickupLocations: [{type: Schema.Types.ObjectId, ref: 'pickupLocations'}],
     userCompany: {type: Schema.Types.ObjectId, ref: 'userCompanies'},
     creditWallet: {type: Schema.Types.ObjectId, ref: 'creditWallets'},
+    expoPushNotificationTokens: [{type: Schema.Types.ObjectId, ref: 'expoPushNotificationTokens'}]
 });
 
 // generating a hash
