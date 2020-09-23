@@ -93,6 +93,7 @@ async function buildJobNotification(job) {
     const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
     const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
+    const {psaQuayCraneSequence} = vessel && vessel.psaVessel? vessel.psaVessel: null;
 
     const items = job.jobItems;
     let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
@@ -220,6 +221,22 @@ async function buildJobNotification(job) {
                 {
                     key: 'Vessel Estimated Berthing Time',
                     value: psaBerthingDateTime
+                }
+            );
+        }
+        if (psaQuayCraneSequence && psaQuayCraneSequence.seqTimeFrom) {
+            notifications.push(
+                {
+                    key: 'Quay Crane Sequence Start',
+                    value: psaQuayCraneSequence.seqTimeFrom
+                }
+            );
+        }
+        if (psaQuayCraneSequence && psaQuayCraneSequence.seqTimeTo) {
+            notifications.push(
+                {
+                    key: 'Quay Crane Sequence End',
+                    value: psaQuayCraneSequence.seqTimeTo
                 }
             );
         }
