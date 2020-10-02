@@ -57,4 +57,6 @@ module.exports = {
     TransporterGPSLocation: require('../models/TransporterGPSLocation'),
     TransporterGPSTracking: require('../models/TransporterGPSTracking'),
     LoadingDetail: require('../models/LoadingDetail'),
+    InventoryItem: require('../models/inventory/InventoryItem'),
+    InventoryItemUOM: require('../models/inventory/InventoryItemUOM'),
 };
