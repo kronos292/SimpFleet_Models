@@ -8,6 +8,7 @@ const schema = new Schema({
     inventoryItemUOM: {type: Schema.Types.ObjectId, ref: 'inventoryItemUOMs'},
     quantity: {type: Number, default: 1},
     userCompany: {type: Schema.Types.ObjectId, ref: 'userCompanies'},
+    isDeleted: {type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('inventoryItems', schema);
