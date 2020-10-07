@@ -104,6 +104,8 @@ async function buildJobNotification(job) {
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
     const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
     const psaQuayCraneSequence = vessel.psaQuayCraneSequence;
+    const seqTimeFrom = psaQuayCraneSequence.seqTimeFrom? await dateTimeFormatter(psaQuayCraneSequence.seqTimeFrom): '';
+    const seqTimeTo = psaQuayCraneSequence.seqTimeTo? await dateTimeFormatter(psaQuayCraneSequence.seqTimeTo): '';
 
     const items = job.jobItems;
     let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
@@ -234,19 +236,19 @@ async function buildJobNotification(job) {
                 }
             );
         }
-        if (psaQuayCraneSequence && psaQuayCraneSequence.seqTimeFrom) {
+        if (seqTimeFrom && seqTimeFrom !== '') {
             notifications.push(
                 {
                     key: 'Quay Crane Sequence Start',
-                    value: psaQuayCraneSequence.seqTimeFrom
+                    value: seqTimeFrom
                 }
             );
         }
-        if (psaQuayCraneSequence && psaQuayCraneSequence.seqTimeTo) {
+        if (seqTimeTo && seqTimeTo !== '') {
             notifications.push(
                 {
                     key: 'Quay Crane Sequence End',
-                    value: psaQuayCraneSequence.seqTimeTo
+                    value: seqTimeTo
                 }
             );
         }
