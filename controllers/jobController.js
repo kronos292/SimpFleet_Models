@@ -10,7 +10,17 @@ async function dateTimeFormatter(date) {
 async function find(findMethod, params) {
     return await Job[findMethod](params).populate({
         path: 'vessel',
-        model: 'vessels'
+        model: 'vessels',
+        populate: [
+            {
+                path: 'psaQuayCraneSequence',
+                model: 'psaQuayCraneSequences'
+            },
+            {
+                path: 'psaVessel',
+                model: 'psaVessels'
+            }
+        ]
     }).populate({
         path: 'vesselLoadingLocation',
         model: 'vesselLoadingLocations',
@@ -93,7 +103,7 @@ async function buildJobNotification(job) {
     const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
     const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
-    const psaQuayCraneSequence = vessel && vessel.psaVessel? vessel.psaVessel.psaQuayCraneSequence: null;
+    const psaQuayCraneSequence = vessel.psaQuayCraneSequence;
 
     const items = job.jobItems;
     let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
