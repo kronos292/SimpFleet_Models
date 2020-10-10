@@ -103,9 +103,14 @@ async function buildJobNotification(job) {
     const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
     const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
     const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
+
     const psaQuayCraneSequence = vessel.psaQuayCraneSequence;
-    const seqTimeFrom = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeFrom? await dateTimeFormatter(psaQuayCraneSequence.seqTimeFrom): '';
-    const seqTimeTo = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeTo? await dateTimeFormatter(psaQuayCraneSequence.seqTimeTo): '';
+    let seqTimeFrom = '';
+    let seqTimeTo = '';
+    if(psaBerthingDateTime && psaBerthingDateTime !== '' && psaUnberthingDateTime && psaUnberthingDateTime !== '') {
+        seqTimeFrom = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeFrom && moment(psaQuayCraneSequence.seqTimeFrom).isAfter(psaBerthingDateTime) && moment(psaQuayCraneSequence.seqTimeFrom).isBefore(psaUnberthingDateTime)? await dateTimeFormatter(psaQuayCraneSequence.seqTimeFrom): '';
+        seqTimeTo = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeTo && moment(psaQuayCraneSequence.seqTimeTo).isAfter(psaBerthingDateTime) && moment(psaQuayCraneSequence.seqTimeTo).isBefore(psaUnberthingDateTime)? await dateTimeFormatter(psaQuayCraneSequence.seqTimeTo): '';
+    }
 
     const items = job.jobItems;
     let itemString = items.length > 0 ? `${items[0].quantity} ${items[0].uom}` : '';
