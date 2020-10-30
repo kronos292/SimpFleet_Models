@@ -22,6 +22,9 @@ async function find(findMethod, params) {
             path: 'creditLogs',
             model: 'creditLogs'
         }
+    }).populate({
+        path: 'expoPushNotificationTokens',
+        model: 'expoPushNotificationTokens'
     }).select();
 }
 
