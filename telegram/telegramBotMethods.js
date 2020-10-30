@@ -417,8 +417,13 @@ async function sendDriverAssignmentNotification(jobTrip) {
     let text = `${driver.firstName} ${driver.lastName} has been assigned to Job Trip ${jobTrip.id}. Jobs involved:\n\n`;
     for(let i = 0; i < jobs.length; i++) {
         const job = jobs[i];
+        const {user, vessel, jobId} = job;
+        const {vesselName} = vessel;
+        const {userCompany} = user;
 
-        text += `${i + 1}) ${job.index}`;
+        text += `${i + 1}) ${job.index}\n`;
+        text += `Job Number: ${jobId}\n`;
+        text += `Vessel: ${vesselName}\n`;
         text += '\n';
     }
 
