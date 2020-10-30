@@ -1,6 +1,7 @@
 const axios = require('axios');
 const moment = require('moment');
 const _ = require('lodash');
+const userController = require("../controllers/userController");
 
 const {LogisticsUser, LogisticsCompany, ExpoPushNotification, JobRequest, JobAssignment, LogisticsService} = require('../util/models');
 
@@ -298,6 +299,36 @@ async function sendDriverAssignmentNotifications(transportUser, job) {
     });
 }
 
+async function sendUserDriverAssignmentNotifications(job) {
+    const {jobTrip, jobId, vessel, user} = job;
+    const {vesselName} = vessel;
+    const {driver} = jobTrip;
+    const {userCompany} = user;
+
+    // Set notification details.
+    const title = `Driver Assigned to Job ${job.index}`;
+    let body = '';
+    body += `Driver Name: ${driver.firstName} ${driver.lastName}\n`;
+    body += `Driver Contact No.: ${driver.contactNumber}\n`;
+    body += `Job Number: ${jobId}\n`;
+    body += `Vessel: ${vesselName}\n`;
+
+    // Get all company users' expo notification tokens
+    const expoPushNotificationTokens = [];
+    if(userCompany) {
+        const users = await userController.find('find', {userCompany: userCompany._id});
+        for(let i = 0; i < users.length; i++) {
+            const userObj = users[i];
+            expoPushNotificationTokens.push(...userObj.expoPushNotificationTokens);
+        }
+    }
+
+    await buildExpoNotification(expoPushNotificationTokens, title, body, {
+        jobId: job._id,
+        type: 'USER_DRIVER_ASSIGNMENT'
+    });
+}
+
 // Reminder to 3PL to assign driver to job.
 async function sendDriverAssignmentReminders() {
     const {jobController, jobAssignmentController} = require('../util/controllers');
@@ -341,5 +372,6 @@ module.exports = {
     sendJobDetailsUpdate,
     sendPSAJobBerthUpdate,
     sendDriverAssignmentNotifications,
-    sendDriverAssignmentReminders
+    sendDriverAssignmentReminders,
+    sendUserDriverAssignmentNotifications
 }
