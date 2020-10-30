@@ -424,6 +424,7 @@ async function sendDriverAssignmentNotification(jobTrip) {
         text += `${i + 1}) ${job.index}\n`;
         text += `Job Number: ${jobId}\n`;
         text += `Vessel: ${vesselName}\n`;
+        text += `Company: ${userCompany.name}\n`;
         text += '\n';
     }
 
