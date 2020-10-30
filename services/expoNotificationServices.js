@@ -260,6 +260,30 @@ async function sendJobDetailsUpdate(job) {
     }
 }
 
+async function sendUserJobDetailsUpdate(job) {
+    const {user} = job;
+    const {userCompany} = user;
+
+    // Set notification details.
+    const title = 'Job Details Updated';
+    const body = `Job Details for ${job.index} has been updated.`;
+
+    // Get all company users' expo notification tokens
+    const expoPushNotificationTokens = [];
+    if(userCompany) {
+        const users = await userController.find('find', {userCompany: userCompany._id});
+        for(let i = 0; i < users.length; i++) {
+            const userObj = users[i];
+            expoPushNotificationTokens.push(...userObj.expoPushNotificationTokens);
+        }
+    }
+
+    await buildExpoNotification(expoPushNotificationTokens, title, body, {
+        jobId: job._id,
+        type: 'USER_JOB_UPDATE'
+    });
+}
+
 async function sendPSAJobBerthUpdate(job) {
     const jobAssignments = await getJobAssignments(job);
 
@@ -373,5 +397,6 @@ module.exports = {
     sendPSAJobBerthUpdate,
     sendDriverAssignmentNotifications,
     sendDriverAssignmentReminders,
-    sendUserDriverAssignmentNotifications
+    sendUserDriverAssignmentNotifications,
+    sendUserJobDetailsUpdate
 }
