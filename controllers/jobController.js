@@ -33,7 +33,11 @@ async function find(findMethod, params) {
         model: 'users',
         populate: {
             path: 'userCompany',
-            model: 'userCompanies'
+            model: 'userCompanies',
+            populate: {
+                path: 'productSuites',
+                model: 'productSuites'
+            }
         }
     }).populate({
         path: 'jobTrackers',
