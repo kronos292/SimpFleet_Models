@@ -8,7 +8,9 @@ const schema = new Schema({
     telegramGroupChatId: {type: String, default: ""},
     productSuites: [{type: Schema.Types.ObjectId, ref: 'productSuites'}],
     logisticsCompanies: [{type: Schema.Types.ObjectId, ref: 'logisticsCompanies'}], // Preferred logistics companies assigned to the company.
-    isApproved: {type: Boolean, default: true}
+    isApproved: {type: Boolean, default: true},
+
+    vesselArrivalJobPromptEmailEnabled: {type: Boolean, default: false}, // Whether job prompt emails via vessel arrival is enabled.
 });
 
 module.exports = mongoose.model('userCompanies', schema);
