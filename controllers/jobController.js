@@ -299,7 +299,7 @@ async function buildJobNotification(job) {
                 }
             );
         }
-        if (job.vesselLighterCompany && job.vesselLighterCompany !== "") {
+        if (job.lighterBoatCompanies && job.lighterBoatCompanies.length > 0) {
             notifications.push(
                 {
                     key: 'Vessel Lighter Company',
