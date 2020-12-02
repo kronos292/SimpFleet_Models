@@ -35,6 +35,7 @@ const jobSchema = new Schema({
     vesselLighterName: {type: String, default: ''},
     vesselLighterLocation: {type: String, default: ''},
     vesselLighterCompany: {type: String, default: ''},
+    lighterBoatCompanies: [{type: Schema.Types.ObjectId, ref: 'lighterBoatCompanies'}],
     vesselLighterRemarks: {type: String, default: ''},
     vesselAnchorageLocation: {type: Schema.Types.ObjectId, ref: 'sgAnchorageLocations'}, // Where the vessel of the job is anchored at (for anchorage jobs only)
     jobTrip: {type: Schema.Types.ObjectId, ref: 'jobTrips'},
