@@ -303,7 +303,7 @@ async function buildJobNotification(job) {
             notifications.push(
                 {
                     key: 'Vessel Lighter Company',
-                    value: job.lighterBoatCompanies[0]
+                    value: job.lighterBoatCompanies[0].companyName
                 }
             );
         }
