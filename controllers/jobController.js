@@ -98,6 +98,9 @@ async function find(findMethod, params) {
     }).populate({
         path: 'vesselAnchorageLocation',
         model: 'sgAnchorageLocations'
+    }).populate({
+        path: 'lighterBoatCompanies',
+        model: 'lighterBoatCompanies'
     }).select();
 }
 
@@ -300,7 +303,7 @@ async function buildJobNotification(job) {
             notifications.push(
                 {
                     key: 'Vessel Lighter Company',
-                    value: job.vesselLighterCompany
+                    value: job.lighterBoatCompanies[0]
                 }
             );
         }
