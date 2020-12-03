@@ -101,6 +101,9 @@ async function find(findMethod, params) {
     }).populate({
         path: 'lighterBoatCompanies',
         model: 'lighterBoatCompanies'
+    }).populate({
+        path: 'otherVesselLoadingLocationObj',
+        model: 'locations'
     }).select();
 }
 
@@ -327,7 +330,7 @@ async function buildJobNotification(job) {
         notifications.push(
             {
                 key: 'Delivery Location',
-                value: job.otherVesselLoadingLocation
+                value: job.otherVesselLoadingLocation.name
             }
         );
         if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
