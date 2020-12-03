@@ -330,7 +330,7 @@ async function buildJobNotification(job) {
         notifications.push(
             {
                 key: 'Delivery Location',
-                value: job.otherVesselLoadingLocation.name
+                value: job.otherVesselLoadingLocationObj.name
             }
         );
         if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {

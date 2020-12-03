@@ -65,7 +65,7 @@
             b
                 span(style='font-family:"Arial",sans-serif')
                     | Vessel Loading Location:
-                    != ` ${job.otherVesselLoadingLocation}`
+                    != ` ${job.otherVesselLoadingLocationObj.name}`
                     o:p
     if job.vesselLoadingLocation.type === 'anchorage'
         p.MsoNormal
