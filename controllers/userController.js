@@ -25,6 +25,9 @@ async function find(findMethod, params) {
     }).populate({
         path: 'expoPushNotificationTokens',
         model: 'expoPushNotificationTokens'
+    }).populate({
+        path: 'adminRoles',
+        model: 'adminRoles'
     }).select();
 }
 
