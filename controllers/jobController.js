@@ -51,7 +51,13 @@ async function find(findMethod, params) {
         populate: [
             {
                 path: 'pickupLocation',
-                model: 'pickupLocations'
+                model: 'pickupLocations',
+                populate: [
+                    {
+                        path: 'location',
+                        model: 'locations'
+                    }
+                ]
             }
         ]
     }).populate({
@@ -60,8 +66,15 @@ async function find(findMethod, params) {
         populate: [
             {
                 path: 'offlandLocation',
-                model: 'offlandLocations'
-            }
+                model: 'offlandLocations',
+                populate: [
+                    {
+                        path: 'location',
+                        model: 'locations'
+                    }
+                ]
+            },
+            
         ]
     }).populate({
         path: 'careOffParties',
