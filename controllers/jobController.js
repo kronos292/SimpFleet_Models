@@ -7,6 +7,157 @@ async function dateTimeFormatter(date) {
     return moment.tz(date, "Asia/Singapore").format('MMMM DD YYYY, HH:mm');
 }
 
+async function constructVesselLocationDetails(job, isOfflandOnly) {
+    const vesselLoadingDateTime = (job.vesselLoadingDateTime !== "" && job.vesselLoadingDateTime !== null) ? await dateTimeFormatter(new Date(job.vesselLoadingDateTime)) : "";
+    const psaBerthingDateTime = (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaBerthingDateTime)): "";
+    const psaUnberthingDateTime = (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) ? await dateTimeFormatter(new Date(job.psaUnberthingDateTime)) : "";
+
+    const vessel = job.vessel;
+    let seqTimeFrom = '';
+    let seqTimeTo = '';
+    if (vessel) {
+        const psaQuayCraneSequence = vessel.psaQuayCraneSequence;
+        if(psaBerthingDateTime && psaBerthingDateTime !== '' && psaUnberthingDateTime && psaUnberthingDateTime !== '') {
+            seqTimeFrom = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeFrom && moment(psaQuayCraneSequence.seqTimeFrom).isAfter(psaBerthingDateTime) && moment(psaQuayCraneSequence.seqTimeFrom).isBefore(psaUnberthingDateTime)? await dateTimeFormatter(psaQuayCraneSequence.seqTimeFrom): '';
+            seqTimeTo = psaQuayCraneSequence && psaQuayCraneSequence.seqTimeTo && moment(psaQuayCraneSequence.seqTimeTo).isAfter(psaBerthingDateTime) && moment(psaQuayCraneSequence.seqTimeTo).isBefore(psaUnberthingDateTime)? await dateTimeFormatter(psaQuayCraneSequence.seqTimeTo): '';
+        }
+    }
+
+    let notifications = [];
+    // Delivery Details.
+    if (job.vesselLoadingLocation.type === 'port') {
+        notifications.push(
+            {
+                key: isOfflandOnly ? 'Offland from': 'Delivery Location',
+                value: job.vesselLoadingLocation.name
+            }
+        );
+    if (job.psaBerf !== '') {
+        notifications.push(
+            {
+                key: 'Berth',
+                value: job.psaBerf
+            }
+        );
+    }
+    if (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) {
+        notifications.push(
+            {
+                key: 'Vessel Estimated Berthing Time',
+                value: psaBerthingDateTime
+            }
+        );
+    }
+    if (seqTimeFrom && seqTimeFrom !== '') {
+        notifications.push(
+            {
+                key: 'Quay Crane Sequence Start',
+                value: seqTimeFrom
+            }
+        );
+    }
+    if (seqTimeTo && seqTimeTo !== '') {
+        notifications.push(
+            {
+                key: 'Quay Crane Sequence End',
+                value: seqTimeTo
+            }
+        );
+    }
+    if (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) {
+        notifications.push(
+            {
+                key: 'Vessel Estimated Unberthing Time',
+                value: psaUnberthingDateTime
+            }
+        );
+    }
+    } else if (job.vesselLoadingLocation.type === 'anchorage') {
+        notifications.push(
+            {
+                key: isOfflandOnly ? 'Offland from': 'Delivery Location',
+                value: job.vesselLoadingLocation.name
+            }
+        );
+        if(job.vesselAnchorageLocation) {
+            notifications.push(
+                {
+                    key: 'Anchorage Name',
+                    value: job.vesselAnchorageLocation.name
+                },
+                {
+                    key: 'Anchorage Code',
+                    value: job.vesselAnchorageLocation.code
+                }
+            );
+        }
+        if (job.vesselLighterName !== "") {
+            notifications.push(
+                {
+                    key: 'Vessel Lighter Name',
+                    value: job.vesselLighterName
+                }
+            );
+        }
+        if (job.lighterBoatCompanies && job.lighterBoatCompanies.length > 0) {
+            notifications.push(
+                {
+                    key: 'Vessel Lighter Company',
+                    value: job.lighterBoatCompanies[0].companyName
+                }
+            );
+        }
+        if (job.vesselLighterRemarks !== "") {
+            notifications.push(
+                {
+                    key: 'Vessel Lighter Remarks',
+                    value: job.vesselLighterRemarks
+                }
+            );
+        }
+        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
+            notifications.push(
+                {
+                    key: isOfflandOnly ? 'Offland Date & Time' : 'Delivery Date & Time',
+                    value: vesselLoadingDateTime
+                }
+            );
+        }
+    } else if (job.vesselLoadingLocation.type === 'others') {
+        notifications.push(
+            {
+                key: isOfflandOnly ? 'Offland from': 'Delivery Location',
+                value: job.otherVesselLoadingLocationObj.name
+            }
+        );
+        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
+            notifications.push(
+                {
+                    key: isOfflandOnly ? 'Offland Date & Time' : 'Delivery Date & Time',
+                    value: vesselLoadingDateTime
+                }
+            );
+        }
+    } else {
+        notifications.push(
+            {
+                key: isOfflandOnly ? 'Offland from': 'Delivery Location',
+                value: job.vesselLoadingLocation.name
+            }
+        );
+        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
+            notifications.push(
+                {
+                    key: isOfflandOnly ? 'Offland Date & Time' : 'Delivery Date & Time',
+                    value: vesselLoadingDateTime
+                }
+            );
+        }
+    }
+
+    return notifications.length > 0 ? notifications : null;
+}
+
 async function find(findMethod, params) {
     return await Job[findMethod](params).populate({
         path: 'vessel',
@@ -161,6 +312,10 @@ async function buildJobNotification(job) {
 
     const notifications = [
         {
+            key: 'groupHeader',
+            value: 'Booking & Vessel Info',
+        },
+        {
             key: 'Job ID',
             value: job.index
         },
@@ -177,7 +332,7 @@ async function buildJobNotification(job) {
             {
                 key: 'Services Required',
                 value: services.map((service, index) => {
-                    return `${service.label}, `
+                    return `${service.label}`
                 })
             }
         );
@@ -211,26 +366,75 @@ async function buildJobNotification(job) {
         );
     }
 
-    // Delivery Items.
-    if(itemString !== '') {
-        notifications.push(
-            {
-                key: 'Items to Deliver',
-                value: itemString
+    if (job.jobItems.length > 0) {
+        // New line for grouping
+        notifications.push({key : "groupHeader", value: "\nDelivery Info"})
+
+        // Delivery Items.
+        if(itemString !== '') {
+            notifications.push(
+                {
+                    key: 'Items to Deliver',
+                    value: itemString
+                }
+            );
+        }
+
+        // Job pickup locations
+        if (job.pickupDetails.length > 0) {
+            let messageString = '';
+            for (let i = 0; i < job.pickupDetails.length; i++) {
+                const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
+                messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}${i == job.pickupDetails.length - 1 ? '' : '\n'}`;
             }
-        );
+            notifications.push(
+                {
+                    key: 'Pick up from',
+                    value: messageString
+                }
+            );
+        }
+
+        let vesselLoadingLocationDetails = await constructVesselLocationDetails(job);
+        if (vesselLoadingLocationDetails) {
+            notifications.push(...vesselLoadingLocationDetails)
+        }
     }
 
-    // Offland Items.
+    // Offland Items
     if(jobOfflandItemString !== '') {
+        notifications.push({key : "groupHeader", value: "\nOffland Info"})
         notifications.push(
             {
                 key: 'Items to Offland',
                 value: jobOfflandItemString
             }
         );
+
+        if (!job.jobItems.length) {
+            let vesselLoadingLocationDetails = await constructVesselLocationDetails(job, true);
+            if (vesselLoadingLocationDetails) {
+                notifications.push(...vesselLoadingLocationDetails)
+            }
+        }
+
+        // Offland details
+        if (job.offlandDetails.length > 0) {
+            let messageString = '';
+            for (let i = 0; i < job.offlandDetails.length; i++) {
+                const offlandDateTime = await dateTimeFormatter(new Date(job.offlandDetails[i].offlandDateTime));
+                messageString += `${offlandDateTime} - ${job.offlandDetails[i].offlandLocation.addressString}${i == job.offlandDetails.length - 1 ? '' : '\n'}`;
+            }
+            notifications.push(
+                {
+                    key: 'Return Items to',
+                    value: messageString
+                }
+            );
+        }
     }
 
+    notifications.push({key : "groupHeader", value: "\nOther Info"})
     // Additional Items.
     if(jobAdditionalItemString !== '') {
         notifications.push(
@@ -239,137 +443,6 @@ async function buildJobNotification(job) {
                 value: jobAdditionalItemString
             }
         );
-    }
-
-    // Delivery Details.
-    if (job.vesselLoadingLocation.type === 'port') {
-        notifications.push(
-            {
-                key: 'Delivery Location',
-                value: job.vesselLoadingLocation.name
-            }
-        );
-        if (job.psaBerf !== '') {
-            notifications.push(
-                {
-                    key: 'Berth',
-                    value: job.psaBerf
-                }
-            );
-        }
-        if (job.psaBerthingDateTime !== "" && job.psaBerthingDateTime !== null) {
-            notifications.push(
-                {
-                    key: 'Vessel Estimated Berthing Time',
-                    value: psaBerthingDateTime
-                }
-            );
-        }
-        if (seqTimeFrom && seqTimeFrom !== '') {
-            notifications.push(
-                {
-                    key: 'Quay Crane Sequence Start',
-                    value: seqTimeFrom
-                }
-            );
-        }
-        if (seqTimeTo && seqTimeTo !== '') {
-            notifications.push(
-                {
-                    key: 'Quay Crane Sequence End',
-                    value: seqTimeTo
-                }
-            );
-        }
-        if (job.psaUnberthingDateTime !== "" && job.psaUnberthingDateTime !== null) {
-            notifications.push(
-                {
-                    key: 'Vessel Estimated Unberthing Time',
-                    value: psaUnberthingDateTime
-                }
-            );
-        }
-    } else if (job.vesselLoadingLocation.type === 'anchorage') {
-        notifications.push(
-            {
-                key: 'Delivery Location',
-                value: job.vesselLoadingLocation.name
-            }
-        );
-        if(job.vesselAnchorageLocation) {
-            notifications.push(
-                {
-                    key: 'Anchorage Name',
-                    value: job.vesselAnchorageLocation.name
-                },
-                {
-                    key: 'Anchorage Code',
-                    value: job.vesselAnchorageLocation.code
-                }
-            );
-        }
-        if (job.vesselLighterName !== "") {
-            notifications.push(
-                {
-                    key: 'Vessel Lighter Name',
-                    value: job.vesselLighterName
-                }
-            );
-        }
-        if (job.lighterBoatCompanies && job.lighterBoatCompanies.length > 0) {
-            notifications.push(
-                {
-                    key: 'Vessel Lighter Company',
-                    value: job.lighterBoatCompanies[0].companyName
-                }
-            );
-        }
-        if (job.vesselLighterRemarks !== "") {
-            notifications.push(
-                {
-                    key: 'Vessel Lighter Remarks',
-                    value: job.vesselLighterRemarks
-                }
-            );
-        }
-        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
-            notifications.push(
-                {
-                    key: 'Delivery Date & Time',
-                    value: vesselLoadingDateTime
-                }
-            );
-        }
-    } else if (job.vesselLoadingLocation.type === 'others') {
-        notifications.push(
-            {
-                key: 'Delivery Location',
-                value: job.otherVesselLoadingLocationObj.name
-            }
-        );
-        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
-            notifications.push(
-                {
-                    key: 'Delivery Date & Time',
-                    value: vesselLoadingDateTime
-                }
-            );
-        }
-    } else {
-        notifications.push(
-            {
-                key: 'Delivery Location',
-                value: job.vesselLoadingLocation.name
-            }
-        );
-        if (job.vesselLoadingDateTime && job.vesselLoadingDateTime !== "") {
-            notifications.push(
-                {
-                    key: 'Delivery Date & Time',
-                    value: vesselLoadingDateTime
-                }
-            );
-        }
     }
 
     // DSA creation.
@@ -442,20 +515,6 @@ async function buildJobNotification(job) {
         );
     }
 
-    // Job pickup.
-    if (job.pickupDetails.length > 0) {
-        let messageString = '\n';
-        for (let i = 0; i < job.pickupDetails.length; i++) {
-            const pickUpDateTime = await dateTimeFormatter(new Date(job.pickupDetails[i].pickupDateTime));
-            messageString += `${pickUpDateTime} - ${job.pickupDetails[i].pickupLocation.addressString}\n`;
-        }
-        notifications.push(
-            {
-                key: 'Pick up from the following locations',
-                value: messageString
-            }
-        );
-    }
 
     // Remarks.
     if (job.remarks && job.remarks !== "") {
@@ -467,7 +526,7 @@ async function buildJobNotification(job) {
 
         notifications.push(
             {
-                key: 'Remarks',
+                key: '\nRemarks',
                 value: messageString
             }
         );

@@ -42,7 +42,11 @@ async function formJobMessage(job, notificationArr, status) {
     for(let i = 0; i < notificationArr.length; i++) {
         const notification = notificationArr[i];
         const {key, value} = notification;
-        messageString += `${key}: ${value}\n`;
+        if (key === 'groupHeader') {
+            messageString += `${value}\n`;
+        } else {
+            messageString += `${key}: ${value}\n`;
+        }
     }
 
     return messageString;
