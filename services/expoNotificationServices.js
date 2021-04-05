@@ -325,7 +325,6 @@ async function sendDriverAssignmentNotifications(transportUser, job) {
 
 async function sendUserDriverAssignmentNotifications(job) {
     const {jobTrip, jobId, vessel, user} = job;
-    const {vesselName} = vessel;
     const {driver} = jobTrip;
     const {userCompany} = user;
 
@@ -335,7 +334,9 @@ async function sendUserDriverAssignmentNotifications(job) {
     body += `Driver Name: ${driver.firstName} ${driver.lastName}\n`;
     body += `Driver Contact No.: ${driver.contactNumber}\n`;
     body += `Job Number: ${jobId}\n`;
-    body += `Vessel: ${vesselName}\n`;
+    if (vessel.vesselName) {
+        body += `Vessel: ${essel.vesselName}\n`;
+    }
 
     // Get all company users' expo notification tokens
     const expoPushNotificationTokens = [];
