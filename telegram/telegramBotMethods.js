@@ -156,7 +156,7 @@ async function sendAdminJobBookingInfo(job, notificationArr) {
             chat_id: keys.SIMPFLEET_TELEGRAM_CHAT_ID,
             text: jobDetails,
             reply_markup: {
-                "inline_keyboard": [keyboardButtons]
+                "inline_keyboard": keyboardButtons
             }
         });
         const message = res.data.result;
