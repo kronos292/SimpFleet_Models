@@ -136,12 +136,20 @@ async function sendAdminJobBookingInfo(job, notificationArr) {
     try {
         const keyboardButtons = [];
         const logisticsCompanies = await LogisticsCompany.find().select();
+        let keyboardButtonArr = [];
         for (let i = 0; i < logisticsCompanies.length; i++) {
+            if(i % 3 === 0 && keyboardButtonArr.length > 0) {
+                keyboardButtons.push(keyboardButtonArr);
+                keyboardButtonArr = [];
+            }
             const logisticsCompany = logisticsCompanies[i];
-            keyboardButtons.push({
+            keyboardButtonArr.push({
                 text: logisticsCompany.name,
                 callback_data: `job_assignment ${logisticsCompany._id} ${job._id}`
             });
+        }
+        if(keyboardButtonArr.length > 0) {
+            keyboardButtons.push(keyboardButtonArr);
         }
 
         const res = await axios.post(`https://api.telegram.org/bot${keys.SIMPFLEET_TELEGRAM_BOT_TOKEN}/sendMessage`, {
