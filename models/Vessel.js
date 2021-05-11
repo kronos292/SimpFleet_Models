@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const mongoosePaginate = require('mongoose-paginate-v2');
+
+require('mongoose-middleware').default.initialize(mongoose)
 
 const vesselSchema = new Schema({
     psaVessels: [{type: Schema.Types.ObjectId, ref: 'psaVessels'}],
@@ -33,5 +34,4 @@ const vesselSchema = new Schema({
     dateTimeUpdated: {type: Date, default: null}
 });
 
-vesselSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model('vessels', vesselSchema);
